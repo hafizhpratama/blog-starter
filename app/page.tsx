@@ -1,6 +1,12 @@
 import { Mail, Twitter, Linkedin } from 'lucide-react';
 import { SKILLS, SOCIAL_LINKS } from './constants';
 import ExperienceSection from './components/Experiences';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Home',
+  description: 'Welcome to the portfolio of Hafizh Pratama, a software engineer specializing in web development and modern technologies.',
+};
 
 export default function AboutPage() {
   return (

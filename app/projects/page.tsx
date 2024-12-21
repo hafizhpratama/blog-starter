@@ -1,5 +1,11 @@
 import { ExternalLink, Link2 } from 'lucide-react';
 import { PROJECTS } from '../constants';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Projects',
+  description: 'Explore my portfolio of web development projects, featuring work in React, Next.js, and modern web technologies.',
+};
 
 export default function ProjectsPage() {
   return (

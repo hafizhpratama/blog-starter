@@ -1,9 +1,9 @@
 import { Inter, Crimson_Text } from 'next/font/google';
 import './globals.css';
+import type { Metadata } from 'next';
 import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
-import StructuredData from './components/StructuredData';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const crimson = Crimson_Text({
@@ -12,6 +12,36 @@ const crimson = Crimson_Text({
   variable: '--font-crimson',
 });
 
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Hafizh Pratama',
+    default: 'Hafizh Pratama - Software Engineer',
+  },
+  description: 'A passionate software engineer focused on creating elegant solutions through clean code and thoughtful design.',
+  openGraph: {
+    title: 'Hafizh Pratama - Software Engineer',
+    description: 'A passionate software engineer focused on creating elegant solutions through clean code and thoughtful design.',
+    url: 'https://hafizh.pages.dev',
+    siteName: 'Hafizh Pratama',
+    locale: 'en_US',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code', // Add this if you have Google Search Console verification
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -19,12 +49,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <StructuredData />
-      </head>
-      <body
-        className={`${inter.variable} ${crimson.variable} font-sans antialiased min-h-screen`}
-      >
+      <body className={`${inter.variable} ${crimson.variable} font-sans antialiased min-h-screen`}>
         <ThemeProvider>
           <div className="min-h-screen flex flex-col">
             <Navigation />

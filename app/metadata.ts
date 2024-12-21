@@ -30,7 +30,7 @@ export const defaultMetadata: Metadata = {
     description: defaultDescription,
     images: [
       {
-        url: 'https://hafizh.pages.dev/og-image.png', // Make sure to add this image to your public folder
+        url: 'https://hafizh.pages.dev/logo.png',
         width: 1200,
         height: 630,
         alt: 'Hafizh Pratama',
@@ -41,7 +41,7 @@ export const defaultMetadata: Metadata = {
     card: 'summary_large_image',
     title: 'Hafizh Pratama - Software Engineer',
     description: defaultDescription,
-    images: ['https://hafizh.pages.dev/og-image.png'],
+    images: ['https://hafizh.pages.dev/logo.png'],
   },
   robots: {
     index: true,
