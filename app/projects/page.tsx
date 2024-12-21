@@ -24,7 +24,7 @@ export default function ProjectsPage() {
                 shadow-sm hover:shadow-md"
             >
               <div className="text-4xl mb-4">{project.emoji}</div>
-              <h3 className="text-xl font-serif italic mb-3">
+              <h3 className="text-xl font-semibold mb-3">
                 {project.title}
               </h3>
               <p className="mb-6 text-gray-600 dark:text-gray-300">

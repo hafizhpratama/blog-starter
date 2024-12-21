@@ -68,7 +68,7 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
               <div className="mb-4">
                 <span className="text-4xl">{article.emoji}</span>
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
                 <div className="flex items-start space-x-4">
                   <div>
                     <span
@@ -77,7 +77,7 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
                     >
                       {article.category}
                     </span>
-                    <h3 className="text-xl font-serif italic">
+                    <h3 className="text-xl font-semibold">
                       {article.title}
                     </h3>
                   </div>

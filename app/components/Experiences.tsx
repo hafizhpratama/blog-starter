@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 interface Experience {
   company: string;
@@ -14,28 +15,36 @@ interface Experience {
 
 const experiences: Experience[] = [
   {
-    company: "Company One",
-    position: "Senior Frontend Developer",
-    period: "2022 - Present",
-    description: "Led the development of multiple web applications using React and Next.js. Implemented modern UI/UX designs and improved application performance.",
-    technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-    logo: "👨‍💻"
-  },
-  {
-    company: "Company Two",
-    position: "Full Stack Developer",
-    period: "2020 - 2022",
-    description: "Developed and maintained full-stack applications. Worked with microservices architecture and implemented CI/CD pipelines.",
-    technologies: ["Node.js", "Express", "MongoDB", "Docker"],
-    logo: "⚡"
-  },
-  {
-    company: "Company Three",
+    company: "Jobseeker Company",
     position: "Software Engineer",
-    period: "2018 - 2020",
-    description: "Built scalable backend services and REST APIs. Collaborated with cross-functional teams to deliver high-quality software solutions.",
-    technologies: ["Python", "Django", "PostgreSQL", "AWS"],
-    logo: "🚀"
+    period: "Mar 2024 - Present",
+    description: "",
+    technologies: ["React", "Next.js", "TypeScript", "AWS"],
+    logo: "/logo_jobseeker.png"
+  },
+  {
+    company: "Surplus Indonesia",
+    position: "Software Engineer",
+    period: "Mar 2023 - Mar 2024",
+    description: "Driving innovation at Surplus Indonesia as a software engineer, building solutions that cut costs and scale impact!",
+    technologies: ["Laravel","Node.js", "Express", "MySQL", "Docker", "AWS"],
+    logo: "/logo_surplus.jpg"
+  },
+  {
+    company: "SIRCLO",
+    position: "Associate Software Engineer",
+    period: "Mar 2021 - Mar 2023",
+    description: "Led a team at Sirclo, streamlining dev, delivering core solutions, and launching a multi-seller feature!",
+    technologies: ["PHP", "Magento", "MySQL", "GraphQL", "AWS", "Laravel"],
+    logo: "/logo_sirclo.png"
+  },
+  {
+    company: "Hukumonline.com",
+    position: "Software Engineer Internship",
+    period: "Oct 2020 - Jan 2021",
+    description: "At Hukumonline, I drove digital transformation, launching key sites and innovating CMS with API integration!",
+    technologies: ["PHP", "MySQL", "WordPress"],
+    logo: "/logo_ho.png"
   }
 ];
 
@@ -44,7 +53,7 @@ export default function ExperienceSection() {
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 340; // Width of card + gap
+      const scrollAmount = 340;
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -60,7 +69,6 @@ export default function ExperienceSection() {
             Work Experience
           </h2>
           
-          {/* Navigation buttons moved outside the scrollable area */}
           <div className="flex items-center space-x-2">
             <button
               onClick={() => scroll('left')}
@@ -85,7 +93,6 @@ export default function ExperienceSection() {
           </div>
         </div>
 
-        {/* Scrollable container */}
         <div 
           ref={scrollContainerRef}
           className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory
@@ -105,12 +112,18 @@ export default function ExperienceSection() {
                 dark:border-neutral-800 p-6 hover:border-neutral-300 
                 dark:hover:border-neutral-700 transition-colors">
                 <div className="flex flex-col h-full">
-                  <div className="mb-4">
-                    <span className="text-4xl">{exp.logo}</span>
+                  <div className="mb-4 h-12 flex">
+                    <Image
+                      src={exp.logo}
+                      alt={`${exp.company} logo`}
+                      width={64}
+                      height={64}
+                      className="object-contain" 
+                    />
                   </div>
                   
                   <div className="flex-grow">
-                    <h3 className="text-lg font-serif italic mb-1">{exp.company}</h3>
+                    <h3 className="text-lg font-semibold mb-1">{exp.company}</h3>
                     <p className="font-medium text-sm mb-1">{exp.position}</p>
                     <p className="text-sm text-muted-foreground mb-4">{exp.period}</p>
                     

@@ -1,4 +1,4 @@
-import { Mail, Twitter, Linkedin } from 'lucide-react';
+import { Mail, Twitter, Linkedin, Github } from 'lucide-react';
 import { SKILLS, SOCIAL_LINKS } from './constants';
 import ExperienceSection from './components/Experiences';
 import { Metadata } from 'next';
@@ -20,14 +20,14 @@ export default function AboutPage() {
               Hello, I&apos;m Hafizh Pratama
             </h1>
             <p className="text-lg sm:text-xl leading-relaxed mb-8 max-w-2xl mx-auto text-muted-foreground">
-              A passionate developer focused on creating elegant solutions
-              through clean code and thoughtful design.
+              Building efficient solutions with precision and purpose, driven by a passion for innovation and engineering excellence.
             </p>
             <div className="flex justify-center space-x-6 mb-12">
               {[
                 { Icon: Twitter, href: SOCIAL_LINKS.twitter, name: "twitter" },
                 { Icon: Linkedin, href: SOCIAL_LINKS.linkedin, name: "linkedin" },
                 { Icon: Mail, href: SOCIAL_LINKS.email, name: "email" },
+                { Icon: Github, href: SOCIAL_LINKS.github, name: "github"}
               ].map(({ Icon, href, name }, index) => (
                 <a
                   key={index}

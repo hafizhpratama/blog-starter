@@ -25,7 +25,7 @@ export function ArticleLayout({ meta, children }: ArticleLayoutProps) {
             <span className="text-6xl sm:text-7xl mb-6 block">
               {meta.emoji}
             </span>
-            <h1 className="text-3xl sm:text-4xl font-serif italic mb-4">
+            <h1 className="text-3xl sm:text-4xl font-semibold mb-4">
               {meta.title}
             </h1>
             <div className="flex flex-wrap justify-center items-center gap-2 text-sm text-muted-foreground">
