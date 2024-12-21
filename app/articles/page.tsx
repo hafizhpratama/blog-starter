@@ -3,7 +3,7 @@ import { getAllArticles } from '../lib/mdx';
 import ArticlesList from './_components/ArticlesList';
 
 export const metadata: Metadata = {
-  title: 'Articles',
+  title: 'Hafizh Pratama | Software Engineer',
   description: 'Technical articles and insights about web development, software engineering, and modern technologies.',
 };
 

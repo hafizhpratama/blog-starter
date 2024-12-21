@@ -4,7 +4,7 @@ import ExperienceSection from './components/Experiences';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Home',
+  title: 'Hafizh Pratama | Software Engineer',
   description: 'Welcome to the portfolio of Hafizh Pratama, a software engineer specializing in web development and modern technologies.',
 };
 
@@ -15,7 +15,7 @@ export default function AboutPage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="mb-12">
-            <div className="text-7xl sm:text-8xl mb-8">👨‍💻</div>
+            <div className="text-7xl sm:text-8xl mb-8">🧑🏻‍💻</div>
             <h1 className="text-4xl sm:text-5xl font-serif italic mb-8">
               Hello, I&apos;m Hafizh Pratama
             </h1>
@@ -25,13 +25,14 @@ export default function AboutPage() {
             </p>
             <div className="flex justify-center space-x-6 mb-12">
               {[
-                { Icon: Twitter, href: SOCIAL_LINKS.twitter },
-                { Icon: Linkedin, href: SOCIAL_LINKS.linkedin },
-                { Icon: Mail, href: SOCIAL_LINKS.email },
-              ].map(({ Icon, href }, index) => (
+                { Icon: Twitter, href: SOCIAL_LINKS.twitter, name: "twitter" },
+                { Icon: Linkedin, href: SOCIAL_LINKS.linkedin, name: "linkedin" },
+                { Icon: Mail, href: SOCIAL_LINKS.email, name: "email" },
+              ].map(({ Icon, href, name }, index) => (
                 <a
                   key={index}
                   href={href}
+                  aria-label={name}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-full hover:bg-accent transition-colors"

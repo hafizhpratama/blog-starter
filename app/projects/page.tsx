@@ -3,7 +3,7 @@ import { PROJECTS } from '../constants';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Projects',
+  title: 'Hafizh Pratama | Software Engineer',
   description: 'Explore my portfolio of web development projects, featuring work in React, Next.js, and modern web technologies.',
 };
 
