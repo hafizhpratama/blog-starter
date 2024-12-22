@@ -3,7 +3,7 @@ import { Project, Skill } from '../types';
 export const PROJECTS: Project[] = [
   {
     title: 'IntentJS',
-    description: 'It&apos;s like Laravel, But for NodeJS.  A refreshing take on traditional nodejs frameworks, change the way you build your products. Intent is an open-source framework with focus on productivity and developer experience.',
+    description: 'It is like Laravel, But for NodeJS.  A refreshing take on traditional nodejs frameworks, change the way you build your products. Intent is an open-source framework with focus on productivity and developer experience.',
     tags: ['IntentJS'],
     link: 'https://tryintent.com/docs/installation',
     sourceCode: '#',
