@@ -61,9 +61,9 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
               href={`/articles/${article.slug}`}
               className="block rounded-xl p-6 transition-all hover:scale-102 transform
                 bg-card text-card-foreground
-                border border-neutral-200 dark:border-neutral-800
-                hover:border-neutral-300 dark:hover:border-neutral-700 
-                shadow-sm hover:shadow-md"
+                border border-neutral-200
+                hover:border-neutral-300
+                shadow-sm hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600"
             >
               <div className="mb-4">
                 <span className="text-4xl">{article.emoji}</span>
