@@ -6,7 +6,7 @@ export const PROJECTS: Project[] = [
     description: 'It is like Laravel, But for NodeJS.  A refreshing take on traditional nodejs frameworks, change the way you build your products. Intent is an open-source framework with focus on productivity and developer experience.',
     tags: ['IntentJS'],
     link: 'https://tryintent.com/docs/installation',
-    sourceCode: '#',
+    sourceCode: '',
     emoji: '💻',
   },
   {
@@ -14,7 +14,7 @@ export const PROJECTS: Project[] = [
     description: 'Seamlessly handles recruitment, candidate management, attendance tracking, employee administration, and payroll processing.',
     tags: ['React', 'Next.js', 'Tailwind'],
     link: 'https://testing.hrms-jobseeker.software/',
-    sourceCode: '#',
+    sourceCode: '',
     emoji: '💼',
   },
   {
@@ -23,7 +23,7 @@ export const PROJECTS: Project[] = [
       'eCommerce boilerplate project built on top of Magento, tailored to meet the common requirements of businesses in Southeast Asia.',
     tags: ['PHP', 'Magento', 'MySQL', 'GraphQL'],
     link: 'https://www.getswift.asia/',
-    sourceCode: '#',
+    sourceCode: '',
     emoji: '🛍️',
   },
   {
@@ -32,7 +32,7 @@ export const PROJECTS: Project[] = [
       'Swift PWA is a cutting-edge Progressive Web Application (PWA) boilerplate designed to build high-performance eCommerce storefronts. It is built from the ground up using Next.js and connects seamlessly to Magento as the backend via GraphQL APIs.',
     tags: ['PHP', 'Magento', 'MySQL', 'GraphQL', 'Tailwind', 'PWA'],
     link: 'https://pwa.getswift.asia/',
-    sourceCode: '#',
+    sourceCode: '',
     emoji: '🛍️',
   },
   {
@@ -41,7 +41,7 @@ export const PROJECTS: Project[] = [
       'Explore a world of possibilities with BlackPepper. From beautifully crafted dashboards to seamless authentication, our platform offers a wealth of examples to ignite your creativity and guide your journey towards building exceptional applications.',
     tags: ['Next.js', 'Shadcn UI', 'Tailwind'],
     link: 'https://blackpepper-app.vercel.app/',
-    sourceCode: '#',
+    sourceCode: '',
     emoji: '💻',
   },
   {
@@ -50,7 +50,7 @@ export const PROJECTS: Project[] = [
       'Discover the power of financial mastery with FinSavvy – the ultimate companion for conquering your financial goals. Streamline your finances, gain valuable insights, and take control of your money like never before.',
     tags: ['React.js', 'Shadcn UI', 'Tailwind', 'Supabase', 'PWA'],
     link: 'https://finsavvy-tool.vercel.app/',
-    sourceCode: '#',
+    sourceCode: '',
     emoji: '💸',
   },
 ];

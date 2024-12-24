@@ -77,7 +77,7 @@ export default function Navigation() {
       {/* Mobile menu */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? 'max-h-48' : 'max-h-0'
+          isMenuOpen ? 'max-h-52' : 'max-h-0'
         } overflow-hidden`}
       >
         <div className="px-4 py-2 space-y-2 border-t border-border">

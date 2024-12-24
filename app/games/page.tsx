@@ -43,24 +43,24 @@ export default function GamesPage() {
                 ))}
               </div>
               <div className="flex space-x-6">
+              {game.sourceCode && (
                 <a
                   href={game.sourceCode}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center hover:text-blue-500 transition-colors"
                 >
-                  <Link2 className="w-4 h-4 mr-2" />
+                 <Link2 className="w-4 h-4 mr-2" />
                   <span className="text-sm">Source</span>
                 </a>
-                <a
-                  href={game.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-blue-500 transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Demo</span>
-                </a>
+              )}
+              <a
+                href={game.link}
+                className="flex items-center hover:text-blue-500 transition-colors"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                <span className="text-sm">Demo</span>
+              </a>
               </div>
             </div>
           ))}
