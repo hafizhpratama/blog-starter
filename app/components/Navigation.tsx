@@ -12,7 +12,7 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const sections: Section[] = ['about', 'projects', 'articles'];
+  const sections: Section[] = ['about', 'projects', 'articles', 'games'];
 
   useEffect(() => {
     setIsMenuOpen(false);

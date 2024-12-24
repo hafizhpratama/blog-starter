@@ -1,4 +1,4 @@
-import { Project, Skill } from '../types';
+import { Game, Project, Skill } from '../types';
 
 export const PROJECTS: Project[] = [
   {
@@ -78,3 +78,14 @@ export const SOCIAL_LINKS = {
   email: 'mailto:hafizhpratama99@email.com',
   github: 'https://github.com/hafizhpratama',
 };
+
+export const GAMES: Game[] = [
+  {
+    title: 'Rock, Paper, Scissors',
+    description: 'The familiar game of Rock, Paper, Scissors is played like this: at the same time, two players display one of three symbols: a rock, paper, or scissors. A rock beats scissors, scissors beat paper by cutting it, and paper beats rock by covering it.',
+    tags: ['Next.js'],
+    link: 'games/rock-paper-scissors',
+    sourceCode: '',
+    emoji: '✊🏻✋🏻✌🏻',
+  },
+];
