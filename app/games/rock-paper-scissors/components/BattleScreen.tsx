@@ -23,13 +23,14 @@ export default function BattleScreen({ userChoice, robotChoice, emojis }: Battle
         </motion.div>
       )}
 
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-      >
-        <div className="text-xl sm:text-2xl font-medium text-neutral-400 dark:text-gray-300">vs</div>
-      </motion.div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+        >
+          <div className="text-xl sm:text-2xl font-medium text-neutral-400 dark:text-gray-300">vs</div>
+        </motion.div>
+      </div>
 
       {robotChoice && (
         <motion.div
