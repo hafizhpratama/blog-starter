@@ -163,7 +163,7 @@ export default function RockPaperScissors() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4 overflow-hidden">
+    <main className="min-h-screen w-full flex items-center justify-center p-4 overflow-hidden">
       <div className="w-full max-w-4xl space-y-8 mx-auto">
         <ScoreBoard
           userLives={userLives}
@@ -209,18 +209,18 @@ export default function RockPaperScissors() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-4xl font-bold text-neutral-800 mb-8"
+                className="dark:text-gray-300 text-4xl font-bold text-neutral-800 mb-8"
               >
                 {userLives > robotLives ? 'Victory!' : 'Game Over'}
               </motion.h2>
-              <p className="text-xl text-neutral-600 mb-8">
+              <p className="text-xl text-neutral-600 mb-8 dark:text-gray-300">
                 Final Score: You {score.user} - {score.robot} Robot
               </p>
               <Button
                 onClick={resetGame}
                 size="lg"
                 variant="outline"
-                className="text-lg px-8 py-6"
+                className="dark:bg-white dark:text-black text-lg px-8 py-6"
               >
                 Play Again
               </Button>
@@ -232,6 +232,6 @@ export default function RockPaperScissors() {
           {result && !gameOver && <ResultOverlay result={result} />}
         </AnimatePresence>
       </div>
-    </div>
+    </main>
   )
 }

@@ -14,11 +14,11 @@ export default function ScoreBoard({ userLives, robotLives, score, streak }: Sco
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-sm"
+      className="dark:bg-gray-800 bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700 dark:hover:border-gray-600"
     >
       <div className="flex justify-between items-center">
         <div className="space-y-1 sm:space-y-2">
-          <h2 className="text-neutral-800 text-base sm:text-xl font-medium">Player</h2>
+          <h2 className="text-neutral-800 text-base sm:text-xl font-medium dark:text-gray-300">Player</h2>
           <div className="flex gap-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
               <motion.div
@@ -35,7 +35,7 @@ export default function ScoreBoard({ userLives, robotLives, score, streak }: Sco
               </motion.div>
             ))}
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-neutral-900">{score.user}</div>
+          <div className="text-xl sm:text-2xl font-semibold text-neutral-900 dark:text-gray-300">{score.user}</div>
         </div>
 
         <div className="text-center px-8">
@@ -48,11 +48,11 @@ export default function ScoreBoard({ userLives, robotLives, score, streak }: Sco
               {streak} Streak
             </motion.div>
           )}
-          <div className="text-neutral-400 font-medium">vs</div>
+          <div className="text-neutral-400 font-medium dark:text-gray-300">vs</div>
         </div>
 
         <div className="space-y-1 sm:space-y-2 text-right">
-          <h2 className="text-neutral-800 text-base sm:text-xl font-medium">Robot</h2>
+          <h2 className="text-neutral-800 text-base sm:text-xl font-medium dark:text-gray-300">Robot</h2>
           <div className="flex gap-1.5 justify-end">
             {Array.from({ length: 5 }).map((_, i) => (
               <motion.div
@@ -69,7 +69,7 @@ export default function ScoreBoard({ userLives, robotLives, score, streak }: Sco
               </motion.div>
             ))}
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-neutral-900">{score.robot}</div>
+          <div className="text-xl sm:text-2xl font-semibold text-neutral-900 dark:text-gray-300">{score.robot}</div>
         </div>
       </div>
     </motion.div>

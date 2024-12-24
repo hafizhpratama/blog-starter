@@ -73,7 +73,7 @@ export default function ExperienceSection() {
             <button
               onClick={() => scroll('left')}
               className="flex items-center justify-center w-8 h-8 rounded-full
-                bg-background border border-neutral-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
+                bg-background border border-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
                 hover:bg-accent transition-colors
                 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Scroll left"
@@ -83,7 +83,7 @@ export default function ExperienceSection() {
             <button
               onClick={() => scroll('right')}
               className="flex items-center justify-center w-8 h-8 rounded-full
-                bg-background border border-neutral-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
+                bg-background border border-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
                 hover:bg-accent transition-colors
                 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Scroll right"
@@ -108,7 +108,7 @@ export default function ExperienceSection() {
               key={index}
               className="flex-shrink-0 w-[280px] sm:w-[340px] snap-center"
             >
-              <div className="h-full bg-card rounded-xl border border-neutral-200 
+              <div className="h-full bg-card rounded-xl border border-gray-100
                 dark:bg-gray-800 dark:border-gray-700 p-6 hover:border-neutral-300 
                 dark:hover:border-gray-600 transition-colors">
                 <div className="flex flex-col h-full">
