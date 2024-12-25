@@ -1,8 +1,5 @@
 'use client';
 
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-
 interface ArticleMeta {
   title: string;
   date: string;

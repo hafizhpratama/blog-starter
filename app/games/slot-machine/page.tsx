@@ -1,207 +1,233 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import confetti from 'canvas-confetti';
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
+import { Button } from '@/components/ui/button'
 
-type Emoji = '🍎' | '🍋' | '🍒' | '🎰' | '💎' | '7️⃣';
-type Slot = Emoji | null;
+type Emoji = '🍎' | '🍋' | '🍒' | '🎰' | '💎' | '7️⃣'
+type WinningCombination = '🍎🍎🍎' | '🍋🍋🍋' | '🍒🍒🍒' | '🎰🎰🎰' | '💎💎💎' | '7️⃣7️⃣7️⃣';
 
-const emojis: Emoji[] = ['🍎', '🍋', '🍒', '🎰', '💎', '7️⃣'];
-const INITIAL_BALANCE = 1000;
-const SPIN_COST = 50;
+const emojis: Emoji[] = ['🍎', '🍋', '🍒', '🎰', '💎', '7️⃣']
+const INITIAL_BALANCE = 1000
+const SPIN_COST = 50
 
-interface WinningCombinations {
-  [key: string]: number;
-}
-
-const WINNING_COMBINATIONS: WinningCombinations = {
+const WINNING_COMBINATIONS = {
   '🍎🍎🍎': 200,
   '🍋🍋🍋': 300,
   '🍒🍒🍒': 400,
   '🎰🎰🎰': 500,
   '💎💎💎': 1000,
   '7️⃣7️⃣7️⃣': 2000,
-};
-
-interface ScoreDisplayProps {
-  balance: number;
-  lastWin: number;
 }
 
-const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ balance, lastWin }) => (
-  <div className="grid grid-cols-2 gap-6 mb-12">
-    <div className="text-center p-6 rounded-2xl bg-white shadow-sm">
-      <p className="text-sm font-medium text-neutral-500 mb-1">Balance</p>
-      <p className="text-3xl font-semibold text-neutral-900">💰 {balance}</p>
-    </div>
-    <div className="text-center p-6 rounded-2xl bg-white shadow-sm">
-      <p className="text-sm font-medium text-neutral-500 mb-1">Last Win</p>
-      <p className="text-3xl font-semibold text-neutral-900">🏆 {lastWin || 0}</p>
-    </div>
-  </div>
-);
+const SYMBOL_HEIGHT = 100
 
-const SlotMachine: React.FC = () => {
-  const [mounted, setMounted] = useState<boolean>(false);
-  const [slots, setSlots] = useState<Emoji[]>(['🎰', '🎰', '🎰']);
-  const [balance, setBalance] = useState<number>(INITIAL_BALANCE);
-  const [isSpinning, setIsSpinning] = useState<boolean>(false);
-  const [lastWin, setLastWin] = useState<number>(0);
-  const [message, setMessage] = useState<string>('Ready to spin? 🎲');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const triggerWinConfetti = (): void => {
-    const duration = 2000;
-    const end = Date.now() + duration;
-    const colors = ['#22c55e', '#14b8a6', '#0ea5e9'];
-
-    const frame = (): void => {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.8 },
-        colors: colors
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.8 },
-        colors: colors
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
-  };
-
-  const checkWin = (currentSlots: Emoji[]): number => {
-    const combination = currentSlots.join('');
-    return WINNING_COMBINATIONS[combination] || 0;
-  };
-
-  const spin = (): void => {
-    if (balance < SPIN_COST) {
-      setMessage('Insufficient credits! 💔');
-      return;
-    }
-    
-    setIsSpinning(true);
-    setBalance(prev => prev - SPIN_COST);
-    setMessage('Spinning... 🎲');
-
-    const spinDuration = 2000;
-    const intervals = 10;
-    let count = 0;
-
-    const spinInterval = setInterval(() => {
-      setSlots(slots.map(() => emojis[Math.floor(Math.random() * emojis.length)]));
-      count++;
-
-      if (count >= intervals) {
-        clearInterval(spinInterval);
-        const finalSlots = slots.map(() => emojis[Math.floor(Math.random() * emojis.length)]);
-        setSlots(finalSlots);
-        const winAmount = checkWin(finalSlots);
-        
-        if (winAmount > 0) {
-          setBalance(prev => prev + winAmount);
-          setLastWin(winAmount);
-          setMessage(`Jackpot! ${winAmount} credits! 🎉`);
-          triggerWinConfetti();
-        } else {
-          setLastWin(0);
-          setMessage('Try again! 🎲');
-        }
-        
-        setIsSpinning(false);
-      }
-    }, spinDuration / intervals);
-  };
-
-  if (!mounted) return null;
+function SlotReel({ 
+  startSymbol,
+  finalSymbol,
+  isSpinning, 
+  stopDelay 
+}: { 
+  startSymbol: Emoji
+  finalSymbol: Emoji
+  isSpinning: boolean
+  stopDelay: number
+}) {
+  const reelSymbols = [startSymbol, ...emojis, ...emojis, finalSymbol]
+  const finalPosition = -(reelSymbols.length - 1) * SYMBOL_HEIGHT
 
   return (
-    <main className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-neutral-50">
-      <div className="w-full max-w-2xl mx-auto space-y-8">
-        <ScoreDisplay balance={balance} lastWin={lastWin} />
+    <div 
+      className="relative w-24 h-[100px] sm:w-32 bg-white dark:bg-gray-800 rounded-xl shadow-sm 
+                 border border-gray-100 dark:border-gray-700 overflow-hidden"
+    >
+      <div className="absolute inset-0">
+        <motion.div
+          className="flex flex-col"
+          initial={{ y: 0 }}
+          animate={isSpinning ? {
+            y: [0, finalPosition],
+            transition: {
+              duration: 2,
+              ease: "easeOut",
+              delay: stopDelay,
+            }
+          } : {
+            y: 0,
+            transition: {
+              duration: 0
+            }
+          }}
+        >
+          {reelSymbols.map((symbol, i) => (
+            <div
+              key={i}
+              className="h-[100px] w-24 sm:w-32 flex items-center justify-center text-5xl sm:text-6xl select-none"
+              style={{ transform: 'translateZ(0)' }}
+            >
+              {symbol}
+            </div>
+          ))}
+        </motion.div>
+      </div>
 
-        <div className="relative">
-          <div className="flex justify-center gap-3 sm:gap-4 md:gap-6 mb-12">
-            {slots.map((emoji, index) => (
-              <motion.div
-                key={index}
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white rounded-2xl flex items-center justify-center text-4xl sm:text-5xl md:text-6xl shadow-sm"
-                animate={{
-                  scale: isSpinning ? [1, 1.1, 1] : 1,
-                  rotateX: isSpinning ? [0, 360] : 0,
-                }}
-                transition={{
-                  duration: 0.3,
-                  repeat: isSpinning ? Infinity : 0,
-                }}
-              >
-                {emoji}
-              </motion.div>
-            ))}
-          </div>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/20 dark:from-white/10 dark:to-white/10" />
+      </div>
+    </div>
+  )
+}
 
-          <motion.div
-            className="text-center mb-8"
-            animate={{ scale: lastWin > 0 ? [1, 1.1, 1] : 1 }}
-          >
-            <p className="text-lg sm:text-xl font-medium text-neutral-600 mb-2">{message}</p>
-            {lastWin > 0 && (
-              <motion.p
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="text-2xl sm:text-3xl font-bold text-green-500"
-              >
-                +{lastWin} 💰
-              </motion.p>
-            )}
-          </motion.div>
+function ScoreBoard({ balance, lastWin }: { balance: number; lastWin: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="flex justify-between items-center px-6 py-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800"
+    >
+      <div>
+        <p className="text-sm text-neutral-500 dark:text-gray-400">Balance</p>
+        <p className="text-2xl font-medium text-neutral-900 dark:text-white">{balance}</p>
+      </div>
+      <div className="text-right">
+        <p className="text-sm text-neutral-500 dark:text-gray-400">Win</p>
+        <p className="text-2xl font-medium text-neutral-900 dark:text-white">{lastWin || '-'}</p>
+      </div>
+    </motion.div>
+  )
+}
 
+export default function EnhancedSlotMachine() {
+  const [mounted, setMounted] = useState(false)
+  const [hasSpunOnce, setHasSpunOnce] = useState(false)
+  const [startSymbols, setStartSymbols] = useState<Emoji[]>(['🍎', '🍎', '🍎'])
+  const [finalSymbols, setFinalSymbols] = useState<Emoji[]>(['🍎', '🍎', '🍎'])
+  const [balance, setBalance] = useState(INITIAL_BALANCE)
+  const [isSpinning, setIsSpinning] = useState(false)
+  const [lastWin, setLastWin] = useState(0)
+  const [showWinPopup, setShowWinPopup] = useState(false);
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const triggerWinConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    })
+  }
+
+  const checkWin = (symbols: Emoji[]): number => {
+    const combination = symbols.join('') as WinningCombination;
+    return WINNING_COMBINATIONS[combination] || 0;
+  }
+
+  const spin = async () => {
+    if (balance < SPIN_COST || isSpinning) return
+    
+    setIsSpinning(true)
+    setBalance(prev => prev - SPIN_COST)
+    setLastWin(0)
+
+    // Generate new final symbols
+    const results = Array.from({ length: 3 }, () => 
+      emojis[Math.floor(Math.random() * emojis.length)]
+    )
+    setFinalSymbols(results)
+
+    // Wait for all reels to stop
+    setTimeout(() => {
+      // Save the results as the starting position for next spin
+      setStartSymbols(results)
+      setHasSpunOnce(true)
+
+      const winAmount = checkWin(results)
+      if (winAmount > 0) {
+        setBalance(prev => prev + winAmount)
+        setLastWin(winAmount)
+        triggerWinConfetti()
+      }
+
+      setIsSpinning(false)
+    }, 3500)
+  }
+
+  useEffect(() => {
+    if (lastWin > 0) {
+      setShowWinPopup(true);
+      const timer = setTimeout(() => {
+        setShowWinPopup(false);
+      }, 2000); // Hide after 2 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [lastWin]);
+
+  if (!mounted) return null
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center p-4">
+      <div className="w-full max-w-lg space-y-8">
+        <ScoreBoard balance={balance} lastWin={lastWin} />
+
+        <div className="flex justify-between gap-3">
+          {[0, 1, 2].map((index) => (
+            <SlotReel
+              key={index}
+              startSymbol={hasSpunOnce ? startSymbols[index] : '🍎'}
+              finalSymbol={finalSymbols[index]}
+              isSpinning={isSpinning}
+              stopDelay={index * 0.5}
+            />
+          ))}
+        </div>
+
+        <AnimatePresence>
+          {showWinPopup && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
+            >
+              <div className="bg-emerald-500 text-white px-6 py-3 rounded-full text-lg font-medium">
+                +{lastWin}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="space-y-4">
           <Button
             onClick={spin}
             disabled={isSpinning || balance < SPIN_COST}
-            size="lg"
-            className={`w-full py-6 text-lg font-medium rounded-xl transition-colors ${
-              isSpinning || balance < SPIN_COST
-                ? 'bg-neutral-200 text-neutral-400'
-                : 'bg-black text-white hover:bg-neutral-800'
-            }`}
+            className={`w-full py-6 text-lg font-medium rounded-xl transition-colors
+              ${isSpinning || balance < SPIN_COST
+                ? 'bg-neutral-100 text-neutral-400 dark:bg-gray-800 dark:text-gray-600'
+                : 'bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black'
+              }`}
           >
-            {isSpinning ? 'Spinning...' : `Spin (${SPIN_COST} credits)`}
+            {isSpinning ? 'Spinning...' : `Spin (${SPIN_COST})`}
           </Button>
 
           <motion.div 
-            className="mt-12 p-6 rounded-2xl bg-white shadow-sm"
+            className="p-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800 text-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <h2 className="text-lg font-semibold text-neutral-900 mb-4">Winning Combinations</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2">
               {Object.entries(WINNING_COMBINATIONS).map(([combo, prize]) => (
-                <div key={combo} className="flex justify-between items-center text-neutral-600">
-                  <span className="text-lg">{combo}</span>
-                  <span className="font-medium">{prize} 💰</span>
+                <div key={combo} className="flex justify-between">
+                  <span className="text-neutral-600 dark:text-gray-400">{combo}</span>
+                  <span className="font-medium text-neutral-900 dark:text-white">{prize}</span>
                 </div>
               ))}
             </div>
           </motion.div>
         </div>
       </div>
-    </main>
-  );
-};
-
-export default SlotMachine;
+    </div>
+  )
+}

@@ -88,4 +88,12 @@ export const GAMES: Game[] = [
     sourceCode: '',
     emoji: '✊🏻✋🏻✌🏻',
   },
+  {
+    title: 'Slot Machine',
+    description: 'A slot machine, fruit machine (British English), poker machine or pokies is a gambling machine that creates a game of chance for its customers.',
+    tags: ['Next.js'],
+    link: 'games/slot-machine',
+    sourceCode: '',
+    emoji: '🎰',
+  },
 ];
