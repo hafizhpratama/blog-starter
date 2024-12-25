@@ -34,13 +34,30 @@ function SlotReel({
   isSpinning: boolean
   stopDelay: number
 }) {
-  const reelSymbols = [startSymbol, ...emojis, ...emojis, finalSymbol]
-  const finalPosition = -(reelSymbols.length - 1) * SYMBOL_HEIGHT
+  const generateReelSymbols = () => {
+    const fullSetCount = 4; // Number of complete symbol sets
+    let symbols = [startSymbol];
+    
+    // Add complete sets of symbols
+    for (let i = 0; i < fullSetCount; i++) {
+      symbols = [...symbols, ...emojis];
+    }
+    
+    // Add symbols up to and including the final symbol
+    const finalIndex = emojis.indexOf(finalSymbol);
+    if (finalIndex !== -1) {
+      symbols = [...symbols, ...emojis.slice(0, finalIndex + 1)];
+    }
+    
+    return symbols;
+  };
+
+  const reelSymbols = generateReelSymbols();
+  const finalPosition = -(reelSymbols.length - 1) * SYMBOL_HEIGHT;
 
   return (
     <div 
-      className="relative w-24 h-[100px] sm:w-32 bg-white dark:bg-gray-800 rounded-xl shadow-sm 
-                 border border-gray-100 dark:border-gray-700 overflow-hidden"
+      className="relative w-24 h-[100px] sm:w-32 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden"
     >
       <div className="absolute inset-0">
         <motion.div
@@ -50,7 +67,7 @@ function SlotReel({
             y: [0, finalPosition],
             transition: {
               duration: 2,
-              ease: "easeOut",
+              ease: [0.45, 0.05, 0.55, 0.95], // Custom easing for more realistic slot machine feel
               delay: stopDelay,
             }
           } : {
@@ -84,7 +101,7 @@ function ScoreBoard({ balance, lastWin }: { balance: number; lastWin: number }) 
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex justify-between items-center px-6 py-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800"
+      className="flex justify-between items-center px-6 py-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
     >
       <div>
         <p className="text-sm text-neutral-500 dark:text-gray-400">Balance</p>
@@ -98,7 +115,7 @@ function ScoreBoard({ balance, lastWin }: { balance: number; lastWin: number }) 
   )
 }
 
-export default function EnhancedSlotMachine() {
+export default function SlotMachine() {
   const [mounted, setMounted] = useState(false)
   const [hasSpunOnce, setHasSpunOnce] = useState(false)
   const [startSymbols, setStartSymbols] = useState<Emoji[]>(['🍎', '🍎', '🍎'])
@@ -168,7 +185,7 @@ export default function EnhancedSlotMachine() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4">
+    <div className="w-full flex items-center justify-center pt-24 pb-16 px-4 sm:px-6">
       <div className="w-full max-w-lg space-y-8">
         <ScoreBoard balance={balance} lastWin={lastWin} />
 
@@ -205,28 +222,41 @@ export default function EnhancedSlotMachine() {
             disabled={isSpinning || balance < SPIN_COST}
             className={`w-full py-6 text-lg font-medium rounded-xl transition-colors
               ${isSpinning || balance < SPIN_COST
-                ? 'bg-neutral-100 text-neutral-400 dark:bg-gray-800 dark:text-gray-600'
+                ? 'bg-neutral-600 text-neutral-100 dark:bg-neutral-50 dark:text-neutral-600'
                 : 'bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black'
               }`}
           >
             {isSpinning ? 'Spinning...' : `Spin (${SPIN_COST})`}
           </Button>
-
-          <motion.div 
-            className="p-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800 text-sm"
+        </div>
+        <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            className="w-full p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-100 dark:border-gray-700"
           >
-            <div className="grid grid-cols-2 gap-2">
+             <p className="text-sm text-neutral-500 dark:text-gray-400 mb-2">Prize</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(WINNING_COMBINATIONS).map(([combo, prize]) => (
-                <div key={combo} className="flex justify-between">
-                  <span className="text-neutral-600 dark:text-gray-400">{combo}</span>
-                  <span className="font-medium text-neutral-900 dark:text-white">{prize}</span>
-                </div>
+                <motion.div
+                  key={combo}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50"
+                >
+                  <span className="text-2xl">{combo}</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {prize.toLocaleString()}
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      coins
+                    </span>
+                  </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
-        </div>
       </div>
     </div>
   )
