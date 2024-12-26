@@ -88,6 +88,7 @@ export default function RockPaperScissors() {
       clearTimeout(resultTimer)
       clearTimeout(resetTimer)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userChoice, robotChoice])
 
   useEffect(() => {

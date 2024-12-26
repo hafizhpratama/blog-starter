@@ -19,7 +19,7 @@ export default function GamesPage() {
             <div
               key={index}
               className="rounded-xl p-6 transition-all hover:scale-105 transform
-                bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700
+                bg-white dark:bg-gray-800 border border-neutral-200 dark:border-gray-700
                 hover:border-gray-200 dark:hover:border-gray-600 
                 shadow-sm hover:shadow-md"
             >

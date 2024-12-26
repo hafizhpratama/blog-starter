@@ -17,7 +17,7 @@ export default function GameChoice({ emoji, onClick, disabled }: GameChoiceProps
       onClick={onClick}
       disabled={disabled}
     >
-      <div className="dark:bg-gray-800 border border-gray-100 dark:border-gray-700 dark:hover:border-gray-600 relative w-full aspect-square bg-white rounded-full shadow-sm transition-shadow hover:shadow-md flex items-center justify-center">
+      <div className="dark:bg-gray-800 border border-neutral-200 dark:border-gray-700 dark:hover:border-gray-600 relative w-full aspect-square bg-white rounded-full shadow-sm transition-shadow hover:shadow-md flex items-center justify-center">
         <span className="text-5xl sm:text-6xl transform transition-transform duration-200 group-hover:scale-110">
           {emoji}
         </span>

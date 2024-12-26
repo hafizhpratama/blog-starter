@@ -30,7 +30,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     const { meta, content } = await getArticleBySlug(params.slug);
 
     return <ArticleLayout meta={meta}>{content}</ArticleLayout>;
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

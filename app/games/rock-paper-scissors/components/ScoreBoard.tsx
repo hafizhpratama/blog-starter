@@ -14,7 +14,7 @@ export default function ScoreBoard({ userLives, robotLives, score, streak }: Sco
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="dark:bg-gray-800 bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700 dark:hover:border-gray-600"
+      className="dark:bg-gray-800 bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-sm border border-neutral-200 dark:border-gray-700 dark:hover:border-gray-600"
     >
       <div className="flex justify-between items-center">
         <div className="space-y-1 sm:space-y-2">

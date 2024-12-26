@@ -61,7 +61,7 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
               href={`/articles/${article.slug}`}
               className="block rounded-xl p-6 transition-all hover:scale-102 transform
                 bg-card text-card-foreground
-                border border-gray-100 dark:border-gray-700
+                border border-neutral-200 dark:border-gray-700
                 shadow-sm hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600"
             >
               <div className="mb-4">

@@ -15,7 +15,7 @@ export default function BattleScreen({ userChoice, robotChoice, emojis }: Battle
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="dark:bg-gray-800 border border-gray-100 dark:border-gray-700 dark:hover:border-gray-600 relative w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-full shadow-sm flex items-center justify-center"
+          className="dark:bg-gray-800 border border-neutral-200 dark:border-gray-700 dark:hover:border-gray-600 relative w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-full shadow-sm flex items-center justify-center"
         >
           <span className="text-6xl sm:text-7xl transform transition-transform duration-200">
             {emojis[userChoice]}
@@ -36,7 +36,7 @@ export default function BattleScreen({ userChoice, robotChoice, emojis }: Battle
         <motion.div
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="dark:bg-gray-800 border border-gray-100 dark:border-gray-700 dark:hover:border-gray-600 relative w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-full shadow-sm flex items-center justify-center"
+          className="dark:bg-gray-800 border border-neutral-200 dark:border-gray-700 dark:hover:border-gray-600 relative w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-full shadow-sm flex items-center justify-center"
         >
           <span className="text-6xl sm:text-7xl transform transition-transform duration-200">
             {emojis[robotChoice]}

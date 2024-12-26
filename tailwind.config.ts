@@ -2,34 +2,34 @@ import type { Config } from 'tailwindcss';
 import typography from '@tailwindcss/typography';
 
 const config: Config = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
-  darkMode: 'class',
-  theme: {
-	extend: {
+	content: [
+		'./pages/**/*.{js,ts,jsx,tsx,mdx}',
+		'./components/**/*.{js,ts,jsx,tsx,mdx}',
+		'./app/**/*.{js,ts,jsx,tsx,mdx}',
+	],
+	darkMode: 'class',
+	theme: {
+		extend: {
 		fontFamily: {
-		  sans: ['var(--font-inter)'],
-		  serif: ['var(--font-crimson)'],
+			sans: ['var(--font-inter)'],
+			serif: ['var(--font-crimson)'],
 		},
 		colors: {
-		  border: 'hsl(var(--border))',
-		  input: 'hsl(var(--input))',
-		  ring: 'hsl(var(--ring))',
-		  background: 'hsl(var(--background))',
-		  foreground: 'hsl(var(--foreground))',
-		  primary: {
-			DEFAULT: 'hsl(var(--primary))',
-			foreground: 'hsl(var(--primary-foreground))',
-		  },
-		  secondary: {
-			DEFAULT: 'hsl(var(--secondary))',
-			foreground: 'hsl(var(--secondary-foreground))',
-		  },
-		  destructive: {
-			DEFAULT: 'hsl(var(--destructive))',
+			border: 'hsl(var(--border))',
+			input: 'hsl(var(--input))',
+			ring: 'hsl(var(--ring))',
+			background: 'hsl(var(--background))',
+			foreground: 'hsl(var(--foreground))',
+			primary: {
+				DEFAULT: 'hsl(var(--primary))',
+				foreground: 'hsl(var(--primary-foreground))',
+			},
+			secondary: {
+				DEFAULT: 'hsl(var(--secondary))',
+				foreground: 'hsl(var(--secondary-foreground))',
+			},
+			destructive: {
+				DEFAULT: 'hsl(var(--destructive))',
 			foreground: 'hsl(var(--destructive-foreground))',
 		  },
 		  muted: {

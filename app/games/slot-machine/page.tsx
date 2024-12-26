@@ -57,7 +57,7 @@ function SlotReel({
 
   return (
     <div 
-      className="relative w-24 h-[100px] sm:w-32 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden"
+      className="relative w-24 h-[100px] sm:w-32 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 overflow-hidden"
     >
       <div className="absolute inset-0">
         <motion.div
@@ -101,7 +101,7 @@ function ScoreBoard({ balance, lastWin }: { balance: number; lastWin: number }) 
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex justify-between items-center px-6 py-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
+      className="flex justify-between items-center px-6 py-4 rounded-xl bg-white/80 backdrop-blur-sm dark:bg-gray-800 border border-neutral-200 dark:border-gray-700"
     >
       <div>
         <p className="text-sm text-neutral-500 dark:text-gray-400">Balance</p>
@@ -232,7 +232,7 @@ export default function SlotMachine() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-full p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-100 dark:border-gray-700"
+            className="w-full p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-neutral-200 dark:border-gray-700"
           >
              <p className="text-sm text-neutral-500 dark:text-gray-400 mb-2">Prize</p>
             
