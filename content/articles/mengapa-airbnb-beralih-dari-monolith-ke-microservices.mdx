@@ -1,0 +1,95 @@
+---
+title: "Mengapa Airbnb Beralih dari Monolith ke Microservices?"
+description: "Analisis mendalam tentang transformasi arsitektur Airbnb dari monolith ke microservices berdasarkan fakta dan data."
+date: 'December 2024'
+readTime: '10 min read'
+category: 'Technology'
+emoji: "🏗️"
+slug: "airbnb-beralih-ke-microservices"
+---
+
+Ketika berbicara tentang skalabilitas dan fleksibilitas sistem, transformasi arsitektur dari **monolith** ke **microservices** menjadi salah satu langkah strategis yang diambil oleh banyak perusahaan teknologi besar, termasuk Airbnb. Dengan jutaan pengguna yang mengakses platform ini setiap hari, kebutuhan untuk mempertahankan kinerja tinggi sekaligus mempercepat pengembangan fitur baru menjadi sangat mendesak. Artikel ini mengulas perjalanan Airbnb dalam beralih dari monolith ke microservices, alasan teknis di balik keputusan ini, serta hasil yang dicapai.
+
+---
+
+## Tantangan dengan Monolith
+
+### 1. **Codebase yang Sulit Dikelola**
+Dalam arsitektur monolith, seluruh aplikasi dikemas dalam satu unit tunggal. Seiring dengan pertumbuhan Airbnb, codebase mereka menjadi sangat besar dan kompleks. Tim engineering menghadapi tantangan berikut:
+- **Waktu build dan deploy yang lama**: Setiap perubahan memerlukan pengujian dan deployment ulang seluruh sistem.
+- **Dependency conflicts**: Modul-modul yang saling tergantung menyebabkan perubahan kecil pada satu bagian memengaruhi bagian lain.
+
+### 2. **Skalabilitas yang Terbatas**
+Monolith sulit untuk diskalakan secara horizontal. Sebagai contoh, jika hanya satu layanan tertentu yang memerlukan peningkatan kapasitas, seluruh aplikasi harus direplikasi, yang tidak efisien dari segi sumber daya.
+
+### 3. **Peningkatan Risiko Downtime**
+Karena semua komponen berada dalam satu kesatuan, kegagalan pada satu bagian dapat menyebabkan **downtime** seluruh aplikasi.
+
+---
+
+## Mengapa Microservices?
+
+Airbnb memilih untuk beralih ke **microservices** karena beberapa alasan teknis utama:
+
+### 1. **Desentralisasi Pengembangan**
+Dengan microservices, setiap layanan dikembangkan, diuji, dan dideploy secara independen. Hal ini memungkinkan tim untuk bekerja pada fitur baru tanpa harus menunggu tim lain menyelesaikan pekerjaan mereka.
+
+### 2. **Skalabilitas Lebih Baik**
+Setiap microservice dapat diskalakan secara independen sesuai dengan kebutuhan spesifiknya. Misalnya, layanan pencarian bisa ditingkatkan kapasitasnya tanpa harus mereplikasi seluruh sistem.
+
+### 3. **Teknologi yang Fleksibel**
+Microservices memungkinkan penggunaan teknologi yang berbeda untuk setiap layanan. Tim engineering dapat memilih bahasa pemrograman atau database yang paling cocok untuk kebutuhan masing-masing layanan.
+
+### 4. **Resilience**
+Jika satu layanan mengalami kegagalan, layanan lainnya tetap berfungsi. Hal ini meningkatkan **uptime** dan pengalaman pengguna.
+
+---
+
+## Strategi Migrasi Airbnb
+
+### 1. **Identifikasi Batas Layanan**
+Langkah pertama Airbnb adalah mengidentifikasi batas layanan dalam monolith mereka. Mereka memetakan domain bisnis utama seperti pemesanan, pembayaran, pencarian, dan rekomendasi, lalu memisahkannya menjadi layanan-layanan independen.
+
+### 2. **Penerapan API Gateway**
+Untuk mengelola komunikasi antar layanan, Airbnb mengimplementasikan **API Gateway** sebagai lapisan penghubung. API Gateway bertanggung jawab untuk merutekan permintaan ke layanan yang sesuai.
+
+### 3. **Pendekatan Incremental**
+Airbnb tidak memigrasikan seluruh sistem sekaligus. Mereka memulai dengan layanan-layanan non-kritikal, seperti notifikasi, sebelum akhirnya memigrasikan layanan inti seperti pemesanan dan pembayaran.
+
+### 4. **Monitoring dan Observability**
+Microservices membutuhkan observasi yang baik untuk memantau performa dan mendeteksi masalah. Airbnb menggunakan tools seperti **Datadog** dan **Jaeger** untuk **tracing**, logging, dan monitoring.
+
+---
+
+## Hasil yang Dicapai
+
+### 1. **Kecepatan Inovasi**
+Setelah migrasi ke microservices, tim engineering Airbnb melaporkan peningkatan produktivitas. Waktu untuk mengembangkan dan meluncurkan fitur baru berkurang secara signifikan.
+
+### 2. **Skalabilitas Tanpa Hambatan**
+Airbnb kini dapat menangani lonjakan traffic secara efisien, seperti pada musim liburan atau acara besar. Microservices memungkinkan mereka untuk menambah kapasitas pada layanan tertentu tanpa menambah beban seluruh sistem.
+
+### 3. **Reliability yang Lebih Baik**
+Dengan isolasi layanan, kegagalan pada satu microservice tidak lagi menyebabkan **downtime** pada seluruh platform. Hal ini meningkatkan pengalaman pengguna secara keseluruhan.
+
+---
+
+## Pelajaran bagi Engineer
+
+Dari pengalaman Airbnb, berikut adalah beberapa pelajaran penting bagi engineer yang ingin mengadopsi arsitektur microservices:
+
+1. **Mulai dengan Domain Bisnis yang Jelas**
+   Memetakan batas domain bisnis adalah langkah penting untuk memisahkan layanan secara logis.
+
+2. **Gunakan Pendekatan Incremental**
+   Jangan mencoba memigrasikan semuanya sekaligus. Mulailah dengan layanan yang kecil dan non-kritikal.
+
+3. **Investasi pada Monitoring dan Observability**
+   Microservices menambah kompleksitas operasional. Monitoring yang baik sangat penting untuk menjaga performa.
+
+4. **Pertimbangkan Kompromi**
+   Microservices bukan solusi untuk semua masalah. Pertimbangkan kebutuhan bisnis dan teknis Anda sebelum memutuskan.
+
+---
+
+Dengan migrasi ke microservices, Airbnb telah berhasil menciptakan arsitektur yang lebih scalable, fleksibel, dan reliable. Perjalanan ini menunjukkan bagaimana transformasi arsitektur dapat menjadi enabler untuk pertumbuhan dan inovasi.
