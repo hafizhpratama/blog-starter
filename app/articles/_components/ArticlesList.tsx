@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Search } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { Search } from "lucide-react";
+import Link from "next/link";
 
 interface Article {
   slug: string;
@@ -19,7 +19,7 @@ interface ArticlesListProps {
 }
 
 export default function ArticlesList({ initialArticles }: ArticlesListProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredArticles = initialArticles.filter(
     (article) =>
@@ -61,7 +61,6 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
               href={`/articles/${article.slug}`}
               className="block rounded-xl p-6 transition-all hover:scale-102 transform
                 bg-card text-card-foreground
-                border border-neutral-200 dark:border-gray-700
                 shadow-sm hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600"
             >
               <div className="mb-4">
@@ -76,9 +75,7 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
                     >
                       {article.category}
                     </span>
-                    <h3 className="text-xl font-semibold">
-                      {article.title}
-                    </h3>
+                    <h3 className="text-xl font-semibold">{article.title}</h3>
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
