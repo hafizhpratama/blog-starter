@@ -1,3 +1,4 @@
+import { generateOpenMojiUrl } from '@/lib/utils';
 import { Metadata } from 'next';
 
 const defaultKeywords = [
@@ -66,14 +67,14 @@ export const rpsMetadata: Metadata = {
   openGraph: {
     title: 'Rock Paper Scissors Game',
     description: 'Challenge the AI in this modern take on Rock Paper Scissors!',
-    images: ['https://hafizh.pages.dev/logo.png'],
+    images: [generateOpenMojiUrl('✌🏻')],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rock Paper Scissors Game',
     description: 'Challenge the AI in this modern take on Rock Paper Scissors!',
-    images: ['https://hafizh.pages.dev/logo.png'],
+    images: [generateOpenMojiUrl('✌🏻')],
   },
   robots: {
     index: true,
@@ -98,14 +99,14 @@ export const smMetadata: Metadata = {
   openGraph: {
     title: 'Classic Slot Machine Game',
     description: 'Try your luck with our beautifully designed slot machine game!',
-    images: ['https://hafizh.pages.dev/logo.png'],
+    images: [generateOpenMojiUrl('🎰')],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Classic Slot Machine Game',
     description: 'Try your luck with our beautifully designed slot machine game!',
-    images: ['https://hafizh.pages.dev/logo.png'],
+    images: [generateOpenMojiUrl('🎰')],
   },
   robots: {
     index: true,

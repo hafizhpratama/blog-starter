@@ -1,11 +1,8 @@
 import { ExternalLink, Link2 } from 'lucide-react';
 import { GAMES } from '../constants';
-import { Metadata } from 'next';
+import { defaultMetadata } from '../metadata';
 
-export const metadata: Metadata = {
-  title: 'Hafizh Pratama | Software Engineer',
-  description: 'Explore my portfolio of web development games, featuring work in React, Next.js, and modern web technologies.',
-};
+export const metadata = defaultMetadata
 
 export default function GamesPage() {
   return (
