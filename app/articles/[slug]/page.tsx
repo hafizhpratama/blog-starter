@@ -1,5 +1,5 @@
 import { ArticleLayout } from '@/app/components/ArticleLayout';
-import { getArticleBySlug } from '@/app/lib/mdx';
+import { getAllArticles, getArticleBySlug } from '@/app/lib/mdx';
 import { generateOpenMojiUrl } from '@/lib/utils';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -42,3 +42,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound();
   }
 }
+
+
+export async function generateStaticParams() {
+  const articles = await getAllArticles();
+  return articles.map((article) => ({
+    slug: article.slug,
+  }));
+}
+
