@@ -14,5 +14,5 @@ export const generateOpenMojiUrl = (emoji: string): string => {
     .map((char) => char.codePointAt(0)?.toString(16).toUpperCase())
     .join("-");
 
-  return `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/${unicode}.svg`;
+  return `/emojis/${unicode}.png`;
 };
