@@ -14,5 +14,5 @@ export const generateOpenMojiUrl = (emoji: string): string => {
     .map((char) => char.codePointAt(0)?.toString(16).toUpperCase())
     .join("-");
 
-  return `/emojis/${unicode}.png`;
+  return `https://hafizh.pages.dev/emojis/${unicode}.png`;
 };
