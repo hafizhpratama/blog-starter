@@ -30,6 +30,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: meta.description,
       images: [generateOpenMojiUrl(meta.emoji)],
     },
+    keywords: meta.keywords,
+    authors: [{ name: 'Hafizh Pratama' }],
+    creator: 'Hafizh Pratama',
   };
 }
 

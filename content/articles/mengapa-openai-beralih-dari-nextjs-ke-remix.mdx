@@ -1,9 +1,9 @@
 ---
 title: "Mengapa OpenAI Beralih dari Next.js ke Remix?"
 description: "Analisis mendalam tentang alasan teknis OpenAI bermigrasi dari Next.js ke Remix, serta dampak positifnya pada performa aplikasi dan pengalaman pengembang."
-date: 'December 2024'
-readTime: '8 min read'
-category: 'Technology'
+date: "December 2024"
+readTime: "8 min read"
+category: "Technology"
 emoji: "⚡"
 slug: "mengapa-openai-beralih-nextjs-ke-remix"
 ---
@@ -12,54 +12,56 @@ Migrasi framework dalam aplikasi skala besar seperti ChatGPT bukanlah keputusan 
 
 ---
 
-## 1. Paradigma Data Fetching: Remix Loaders vs Next.js API
+## Apa yang Membuat OpenAI Memilih Remix daripada Next.js?
+
+### 1. Paradigma Data Fetching: Remix Loaders vs Next.js API
 
 Salah satu perbedaan mendasar antara Next.js dan Remix adalah pendekatan mereka terhadap pengambilan data.
 
-### Next.js
+#### Next.js
 - Menggunakan `getServerSideProps`, `getStaticProps`, atau `getInitialProps` untuk mengambil data di server.
 - Pendekatan ini memisahkan data fetching dari komponen utama, sehingga memerlukan boilerplate yang signifikan.
 - Tantangan muncul pada aplikasi yang membutuhkan pengambilan data secara paralel dan fleksibel, terutama saat menangani nested routes.
 
-### Remix
+#### Remix
 - **Loader API** bawaan mengintegrasikan pengambilan data langsung ke dalam lifecycle routing.
 - Data di-fetch sebelum rendering halaman, memungkinkan pengguna mendapatkan halaman dengan data yang lengkap tanpa memuat ulang konten.
 - Data fetching paralel: Semua loader pada nested routes berjalan serentak, yang secara signifikan mempercepat waktu respon aplikasi.
 
 **Keuntungan untuk Software Engineer:**
-- **Sederhana**: Tidak perlu boilerplate untuk menghubungkan data dengan komponen.
-- **Efisien**: Waktu respon lebih cepat karena pengambilan data paralel.
-- **Error Handling**: Remix mendukung error boundaries yang ditentukan di tingkat route, mempermudah debugging dan pengelolaan fallback UI.
+- **Sederhana:** Tidak perlu boilerplate untuk menghubungkan data dengan komponen.
+- **Efisien:** Waktu respon lebih cepat karena pengambilan data paralel.
+- **Error Handling:** Remix mendukung error boundaries di tingkat route, mempermudah debugging dan pengelolaan fallback UI.
 
 ---
 
-## 2. Routing dan Arsitektur Nested Routes
+### 2. Routing dan Arsitektur Nested Routes
 
 Salah satu alasan utama migrasi adalah kebutuhan untuk mendukung navigasi kompleks.
 
-### Next.js
+#### Next.js
 - Menggunakan file-based routing, di mana struktur folder menentukan URL.
 - Namun, **nested routes** tidak didukung secara bawaan. Untuk implementasi nested routes, pengembang perlu membuat solusi manual yang rentan terhadap overhead kode tambahan.
 
-### Remix
+#### Remix
 - Routing di Remix didasarkan pada **React Router**, yang mendukung nested routes secara langsung.
 - Komponen untuk parent dan child route dapat di-render secara bersamaan, memungkinkan pembaruan hanya pada bagian halaman tertentu tanpa merender ulang seluruh halaman.
 
 **Keuntungan untuk Software Engineer:**
-- **Pengelolaan yang modular**: Nested routes memungkinkan pembagian kode menjadi bagian kecil yang dapat digunakan ulang.
-- **Optimalisasi rendering**: Partial updates mempercepat navigasi antar bagian aplikasi.
+- **Pengelolaan yang modular:** Nested routes memungkinkan pembagian kode menjadi bagian kecil yang dapat digunakan ulang.
+- **Optimalisasi rendering:** Partial updates mempercepat navigasi antar bagian aplikasi.
 
 ---
 
-## 3. Sistem Build: Webpack vs Vite
+### 3. Sistem Build: Webpack vs Vite
 
 Migrasi ke Remix juga membawa perubahan dalam sistem build, dari **Webpack** (Next.js) ke **Vite**.
 
-### Next.js dengan Webpack
+#### Next.js dengan Webpack
 - Webpack, meskipun kuat, memiliki waktu build yang lebih lama pada aplikasi besar.
 - Hot Module Replacement (HMR) pada Webpack juga relatif lebih lambat dibandingkan dengan alternatif modern.
 
-### Remix dengan Vite
+#### Remix dengan Vite
 - **Vite** menggunakan ESBuild sebagai bundler, yang secara signifikan lebih cepat dibandingkan Webpack.
 - Hot reload hampir instan, meningkatkan pengalaman pengembang selama pengembangan aplikasi.
 
@@ -69,13 +71,13 @@ Migrasi ke Remix juga membawa perubahan dalam sistem build, dari **Webpack** (Ne
 
 ---
 
-## 4. Progressive Enhancement dan Server-Side Rendering (SSR)
+### 4. Progressive Enhancement dan Server-Side Rendering (SSR)
 
 Remix dirancang dengan filosofi **progressive enhancement**, yang memastikan aplikasi tetap fungsional bahkan tanpa JavaScript.
 
-### Keunggulan Remix:
-- **Streaming SSR**: Remix mampu mengirimkan konten halaman dalam bentuk stream ke browser, sehingga pengguna bisa melihat konten lebih cepat dibandingkan menunggu halaman lengkap ter-render.
-- **Fallback ke HTML dasar**: Jika JavaScript gagal dimuat, halaman tetap bisa digunakan karena semua logika dasar sudah ada di server.
+#### Keunggulan Remix:
+- **Streaming SSR:** Remix mampu mengirimkan konten halaman dalam bentuk stream ke browser, sehingga pengguna bisa melihat konten lebih cepat dibandingkan menunggu halaman lengkap ter-render.
+- **Fallback ke HTML dasar:** Jika JavaScript gagal dimuat, halaman tetap bisa digunakan karena semua logika dasar sudah ada di server.
 
 **Keuntungan:**
 - Waktu muat awal lebih cepat pada jaringan dengan latensi tinggi.
@@ -83,9 +85,10 @@ Remix dirancang dengan filosofi **progressive enhancement**, yang memastikan apl
 
 ---
 
-## 5. Hasil Migrasi: Pengukuran Performansi
+## Apakah Performanya Meningkat Setelah Migrasi?
 
 Berdasarkan data yang tersedia, berikut adalah dampak teknis setelah migrasi:
+
 
 <table>
   <thead>
@@ -129,12 +132,12 @@ Berdasarkan data yang tersedia, berikut adalah dampak teknis setelah migrasi:
 
 ---
 
-## 6. Tantangan Migrasi
+## Tantangan Migrasi
 
 Meski memberikan banyak manfaat, migrasi ini juga menghadirkan beberapa tantangan:
-- **Refactoring kode besar-besaran**: Sistem routing dan data fetching yang berbeda memerlukan perubahan signifikan pada arsitektur kode.
-- **Pembaruan testing**: Setiap perubahan pada komponen membutuhkan pembaruan pada unit dan integration tests.
-- **Pelatihan tim**: Developer yang terbiasa dengan Next.js perlu waktu untuk memahami pendekatan Remix.
+- **Refactoring kode besar-besaran:** Sistem routing dan data fetching yang berbeda memerlukan perubahan signifikan pada arsitektur kode.
+- **Pembaruan testing:** Setiap perubahan pada komponen membutuhkan pembaruan pada unit dan integration tests.
+- **Pelatihan tim:** Developer yang terbiasa dengan Next.js perlu waktu untuk memahami pendekatan Remix.
 
 ---
 
@@ -144,4 +147,5 @@ Migrasi OpenAI dari Next.js ke Remix adalah langkah strategis yang dipandu oleh 
 
 Bagi software engineer, studi kasus ini adalah contoh penting tentang bagaimana memahami kebutuhan arsitektural aplikasi dan memilih framework yang benar-benar sesuai, bukan hanya yang populer.
 
-Apakah framework Anda sudah memenuhi kebutuhan teknis aplikasi Anda? Migrasi ini memberikan inspirasi bahwa kadang langkah besar diperlukan untuk mencapai tujuan jangka panjang.
+### Tertarik untuk Mengadopsi Remix?
+Jika Anda mempertimbangkan untuk beralih ke Remix, pastikan untuk mengidentifikasi kebutuhan aplikasi Anda dengan jelas dan pelajari dokumentasi [Remix](https://remix.run) secara mendalam.

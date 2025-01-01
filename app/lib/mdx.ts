@@ -23,6 +23,7 @@ interface ArticleMeta {
   category: string;
   emoji: string;
   slug: string;
+  keywords: string[];
 }
 
 export async function getArticleBySlug(slug: string) {
