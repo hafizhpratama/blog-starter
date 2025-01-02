@@ -7,10 +7,8 @@ import Link from 'next/link';
 import { Section } from '../types';
 import { useTheme } from '../context/ThemeContext';
 
-// Pre-define sections to avoid recreation on each render
 const SECTIONS: Section[] = ['about', 'projects', 'articles', 'games'];
 
-// Memoize the NavLink component
 const NavLink = memo(function NavLink({ 
   section, 
   pathname,
@@ -54,7 +52,6 @@ const NavLink = memo(function NavLink({
   );
 });
 
-// Memoize the ThemeToggle component
 const ThemeToggle = memo(function ThemeToggle({ 
   theme, 
   toggleTheme 
@@ -62,7 +59,6 @@ const ThemeToggle = memo(function ThemeToggle({
   theme: string;
   toggleTheme: () => void;
 }) {
-  // Use useEffect to handle client-side only rendering of theme icon
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -131,7 +127,6 @@ function Navigation() {
     setIsMenuOpen(prev => !prev);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);

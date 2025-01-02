@@ -8,16 +8,11 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "class",
-  future: {
-    hoverOnlyWhenSupported: true,
-    respectDefaultRingColorOpacity: true,
-    disableColorOpacityUtilitiesByDefault: true,
-  },
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        serif: ["var(--font-crimson)", "Georgia", "serif"],
+        sans: ["var(--font-inter)"],
+        serif: ["var(--font-crimson)"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -57,29 +52,6 @@ const config: Config = {
     },
   },
   plugins: [typography],
-  // Optimize variants
-  corePlugins: {
-    preflight: true,
-    container: false,
-  },
-  // Add purge options
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    content: [
-      './pages/**/*.{js,ts,jsx,tsx,mdx}',
-      './components/**/*.{js,ts,jsx,tsx,mdx}',
-      './app/**/*.{js,ts,jsx,tsx,mdx}',
-    ],
-    options: {
-      safelist: [
-        'dark',
-        /^bg-/,
-        /^text-/,
-        'transition-colors',
-        'duration-300',
-      ],
-    },
-  },
 };
 
 export default config;

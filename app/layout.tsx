@@ -5,7 +5,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 
-// Optimize font loading
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -61,17 +60,6 @@ export default function RootLayout({
       suppressHydrationWarning 
       className={`${inter.variable} ${crimson.variable}`}
     >
-      <head>
-        <link 
-          rel="preconnect" 
-          href="https://fonts.googleapis.com" 
-        />
-        <link 
-          rel="preconnect" 
-          href="https://fonts.gstatic.com" 
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className="font-sans antialiased min-h-screen flex flex-col">
         <ThemeProvider>
           <Navigation />

@@ -3,13 +3,11 @@ import dynamic from 'next/dynamic';
 import { Mail, Twitter, Linkedin, Github, LucideIcon } from 'lucide-react';
 import { EXPERIENCES, SKILLS, SOCIAL_LINKS } from './constants';
 
-// Lazy load the ExperienceSection component
 const ExperienceSection = dynamic(() => import('./components/Experiences'), {
   loading: () => <div className="animate-pulse h-96 bg-accent rounded-lg" />,
   ssr: false
 });
 
-// Optimize social links rendering
 const SocialLink = ({ Icon, href, name }: { Icon: LucideIcon; href: string; name: string }) => (
   <a
     href={href}
@@ -22,7 +20,6 @@ const SocialLink = ({ Icon, href, name }: { Icon: LucideIcon; href: string; name
   </a>
 );
 
-// Optimize skill badge rendering
 const SkillBadge = ({ name }: { name: string }) => (
   <span className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105 transform bg-accent text-accent-foreground">
     {name}
