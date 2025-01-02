@@ -22,3 +22,12 @@ export interface Skill {
   name: string;
   category: 'frontend' | 'backend' | 'devops' | 'other';
 }
+
+export interface Experience {
+  company: string;
+  position: string;
+  period: string;
+  description: string;
+  technologies: string[];
+  logo: string;
+}

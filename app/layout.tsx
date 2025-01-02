@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'your-google-verification-code', // Add this if you have Google Search Console verification
+    google: 'your-google-verification-code', 
   },
 };
 
@@ -49,13 +49,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${crimson.variable} font-sans antialiased min-h-screen`}>
+      <body className={`${inter.variable} ${crimson.variable} font-sans antialiased min-h-screen`}> 
         <ThemeProvider>
-          <div className="min-h-screen flex flex-col">
+          <>  
             <Navigation />
             <main className="flex-1">{children}</main>
             <Footer />
-          </div>
+          </>
         </ThemeProvider>
       </body>
     </html>

@@ -1,4 +1,5 @@
-import { Game, Project, Skill } from '../types';
+
+import { Experience, Game, Project, Skill } from '../types';
 
 export const PROJECTS: Project[] = [
   {
@@ -97,3 +98,38 @@ export const GAMES: Game[] = [
     emoji: '🎰',
   },
 ];
+
+export const EXPERIENCES: Experience[] = [
+  {
+    company: "Jobseeker Company",
+    position: "Software Engineer",
+    period: "Mar 2024 - Present",
+    description: "",
+    technologies: ["React", "Next.js", "TypeScript", "AWS"],
+    logo: "/logo_jobseeker.png"
+  },
+  {
+    company: "Surplus Indonesia",
+    position: "Software Engineer",
+    period: "Mar 2023 - Mar 2024",
+    description: "Driving innovation at Surplus Indonesia as a software engineer, building solutions that cut costs and scale impact!",
+    technologies: ["Laravel","Node.js", "Express", "MySQL", "Docker", "AWS"],
+    logo: "/logo_surplus.jpg"
+  },
+  {
+    company: "SIRCLO",
+    position: "Associate Software Engineer",
+    period: "Mar 2021 - Mar 2023",
+    description: "Led a team at Sirclo, streamlining dev, delivering core solutions, and launching a multi-seller feature!",
+    technologies: ["PHP", "Magento", "MySQL", "GraphQL", "AWS", "Laravel"],
+    logo: "/logo_sirclo.png"
+  },
+  {
+    company: "Hukumonline.com",
+    position: "Software Engineer Internship",
+    period: "Oct 2020 - Jan 2021",
+    description: "At Hukumonline, I drove digital transformation, launching key sites and innovating CMS with API integration!",
+    technologies: ["PHP", "MySQL", "WordPress"],
+    logo: "/logo_ho.png"
+  }
+] as const;
