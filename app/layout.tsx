@@ -1,15 +1,26 @@
 import { Inter, Crimson_Text } from 'next/font/google';
-import './globals.css';
 import type { Metadata } from 'next';
+import './globals.css';
 import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+// Optimize font loading
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'optional',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+});
+
 const crimson = Crimson_Text({
   weight: ['400', '600', '700'],
   subsets: ['latin'],
   variable: '--font-crimson',
+  display: 'optional',
+  preload: true,
+  fallback: ['Georgia', 'serif'],
 });
 
 export const metadata: Metadata = {
@@ -37,9 +48,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'your-google-verification-code', 
-  },
 };
 
 export default function RootLayout({
@@ -48,14 +56,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${crimson.variable} font-sans antialiased min-h-screen`}> 
+    <html 
+      lang="en" 
+      suppressHydrationWarning 
+      className={`${inter.variable} ${crimson.variable}`}
+    >
+      <head>
+        <link 
+          rel="preconnect" 
+          href="https://fonts.googleapis.com" 
+        />
+        <link 
+          rel="preconnect" 
+          href="https://fonts.gstatic.com" 
+          crossOrigin="anonymous"
+        />
+      </head>
+      <body className="font-sans antialiased min-h-screen flex flex-col">
         <ThemeProvider>
-          <>  
-            <Navigation />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

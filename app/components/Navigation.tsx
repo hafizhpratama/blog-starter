@@ -26,6 +26,7 @@ const NavLink = memo(function NavLink({
   if (isMobile) {
     return (
       <Link
+        rel="preload"
         href={href}
         className={`block w-full text-left px-4 py-2 rounded-lg transition capitalize
           ${isActive 
@@ -41,6 +42,7 @@ const NavLink = memo(function NavLink({
 
   return (
     <Link
+      rel="preload"
       href={href}
       className={`relative text-sm font-medium transition capitalize
         ${isActive ? 'text-blue-500' : 'text-muted-foreground hover:text-foreground'}

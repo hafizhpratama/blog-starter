@@ -1,35 +1,42 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
-    poweredByHeader: false,
-    compress: true,
-    reactStrictMode: true,
-    swcMinify: true,
-    compiler: {
-      removeConsole: process.env.NODE_ENV === 'production',
-    },
-    experimental: {
-      optimizeCss: true,
-      turbo: {
-        rules: {
-          // Prevent specific files from being included in the client bundle
-          '*.server.ts': ['server-only'],
-        },
-      },
-    },
-    webpack: (config, { dev, isServer }) => {
-      // Optimize CSS extraction
-      if (!dev && !isServer) {
-        config.optimization.splitChunks.cacheGroups.styles = {
+  output: 'standalone',
+  poweredByHeader: false,
+  compress: true,
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error'],
+    } : false,
+  },
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react'],
+  },
+  webpack: (config, { dev, isServer }) => {
+    // Optimize CSS extraction in production client builds
+    if (!dev && !isServer) {
+      config.optimization.splitChunks.cacheGroups = {
+        ...config.optimization.splitChunks.cacheGroups,
+        styles: {
           name: 'styles',
           test: /\.(css|scss)$/,
           chunks: 'all',
           enforce: true,
-        };
-      }
-  
-      return config;
-    },
-  };
-  
-  module.exports = nextConfig;
+          priority: 10,
+        },
+        commons: {
+          name: 'commons',
+          chunks: 'all',
+          minChunks: 2,
+          priority: 0,
+        },
+      };
+    }
+
+    return config;
+  },
+};
+
+module.exports = nextConfig;

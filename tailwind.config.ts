@@ -16,8 +16,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)"],
-        serif: ["var(--font-crimson)"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        serif: ["var(--font-crimson)", "Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -57,11 +57,27 @@ const config: Config = {
     },
   },
   plugins: [typography],
-  variants: {
-    extend: {
-      backgroundColor: ['dark'],
-      textColor: ['dark'],
-      borderColor: ['dark'],
+  // Optimize variants
+  corePlugins: {
+    preflight: true,
+    container: false,
+  },
+  // Add purge options
+  purge: {
+    enabled: process.env.NODE_ENV === 'production',
+    content: [
+      './pages/**/*.{js,ts,jsx,tsx,mdx}',
+      './components/**/*.{js,ts,jsx,tsx,mdx}',
+      './app/**/*.{js,ts,jsx,tsx,mdx}',
+    ],
+    options: {
+      safelist: [
+        'dark',
+        /^bg-/,
+        /^text-/,
+        'transition-colors',
+        'duration-300',
+      ],
     },
   },
 };

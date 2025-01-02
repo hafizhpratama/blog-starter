@@ -57,6 +57,7 @@ export default function ArticlesList({ initialArticles }: ArticlesListProps) {
         ) : (
           filteredArticles.map((article) => (
             <Link
+              rel="preload"
               key={article.slug}
               href={`/articles/${article.slug}`}
               className="block rounded-xl p-6 transition-all hover:scale-102 transform
