@@ -29,5 +29,5 @@ export interface Experience {
   period: string;
   description: string;
   technologies: string[];
-  logo: string;
+  emoji: string;
 }

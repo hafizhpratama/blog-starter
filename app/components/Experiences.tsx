@@ -2,7 +2,6 @@
 
 import { useRef, useCallback, memo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import { Experience } from "../types";
 
 const ExperienceCard = memo(({ exp }: { exp: Experience }) => (
@@ -13,16 +12,8 @@ const ExperienceCard = memo(({ exp }: { exp: Experience }) => (
                 dark:hover:border-gray-600 transition-colors"
     >
       <div className="flex flex-col h-full">
-        <div className="mb-4 h-12 flex">
-        <Image
-          src={exp.logo}
-          alt={`${exp.company} logo`}
-          width={64}
-          height={64}
-          className="object-contain w-16 h-16"
-          loading="lazy"
-          sizes="64px"
-        />
+        <div className="mb-4">
+          <span className="text-4xl">{exp.emoji}</span>
         </div>
         <div className="flex-grow">
           <h3 className="text-lg font-semibold mb-1">{exp.company}</h3>

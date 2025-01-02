@@ -106,7 +106,7 @@ export const EXPERIENCES: Experience[] = [
     period: "Mar 2024 - Present",
     description: "",
     technologies: ["React", "Next.js", "TypeScript", "AWS"],
-    logo: "/logo_jobseeker.png"
+    emoji: "💼",
   },
   {
     company: "Surplus Indonesia",
@@ -114,7 +114,7 @@ export const EXPERIENCES: Experience[] = [
     period: "Mar 2023 - Mar 2024",
     description: "Driving innovation at Surplus Indonesia as a software engineer, building solutions that cut costs and scale impact!",
     technologies: ["Laravel","Node.js", "Express", "MySQL", "Docker", "AWS"],
-    logo: "/logo_surplus.jpg"
+    emoji: "🌱"
   },
   {
     company: "SIRCLO",
@@ -122,7 +122,7 @@ export const EXPERIENCES: Experience[] = [
     period: "Mar 2021 - Mar 2023",
     description: "Led a team at Sirclo, streamlining dev, delivering core solutions, and launching a multi-seller feature!",
     technologies: ["PHP", "Magento", "MySQL", "GraphQL", "AWS", "Laravel"],
-    logo: "/logo_sirclo.png"
+    emoji: "🛍️"
   },
   {
     company: "Hukumonline.com",
@@ -130,6 +130,6 @@ export const EXPERIENCES: Experience[] = [
     period: "Oct 2020 - Jan 2021",
     description: "At Hukumonline, I drove digital transformation, launching key sites and innovating CMS with API integration!",
     technologies: ["PHP", "MySQL", "WordPress"],
-    logo: "/logo_ho.png"
+    emoji: "⚖️"
   }
 ] as const;

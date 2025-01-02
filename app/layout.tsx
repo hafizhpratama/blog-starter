@@ -2,8 +2,7 @@ import { Inter, Crimson_Text } from 'next/font/google';
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from './context/ThemeContext';
-import Navigation from './components/Navigation';
-import Footer from './components/Footer';
+import dynamic from 'next/dynamic';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -48,6 +47,14 @@ export const metadata: Metadata = {
     },
   },
 };
+
+const Navigation = dynamic(() => import('./components/Navigation'), {
+  ssr: false 
+})
+
+const Footer = dynamic(() => import('./components/Footer'), {
+  ssr: false 
+})
 
 export default function RootLayout({
   children,
