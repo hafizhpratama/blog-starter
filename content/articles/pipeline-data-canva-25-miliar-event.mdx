@@ -1,0 +1,130 @@
+---
+title: "Bagaimana Canva Mengelola 25 Miliar Event per Hari dengan Data Pipeline yang Scalable dan Reliable"
+description: "Pelajari arsitektur pipeline data Canva yang memproses miliaran event setiap hari dengan efisiensi tinggi dan uptime 99,999%."
+date: "January 2025"
+readTime: "10 min read"
+category: "Technology"
+emoji: "📊"
+slug: "pipeline-data-canva-25-miliar-event"
+keywords: ["Canva", "Pipeline Data", "Big Data", "Kinesis Data Stream", "Protobuf", "Datumgen", "Scalability", "Reliability", "Cost Optimization"]
+---
+
+Di Canva, analytics bukan hanya alat pengukuran—ini adalah dasar dari pengambilan keputusan berbasis data. Dengan lebih dari **25 miliar event per hari** atau setara **800 miliar event per bulan**, arsitektur data pipeline Canva dirancang untuk **reliability**, **scalability**, dan **cost efficiency**. Artikel ini menjelaskan bagaimana tim engineering Canva membangun dan mengelola pipeline data yang mampu memenuhi kebutuhan skala besar dengan performa tinggi.
+
+---
+
+## Tantangan Utama: Reliability, Cost Efficiency, dan Scalability
+
+Mengelola miliaran event setiap hari bukan tanpa tantangan. Canva menghadapi tiga prioritas utama:
+
+1. **Reliability:** Menjamin uptime **99,999%** agar sistem tetap berjalan tanpa gangguan.
+2. **Cost Efficiency:** Meminimalkan biaya operasional tanpa mengorbankan performa.
+3. **Scalability:** Sistem harus mampu bertumbuh seiring peningkatan jumlah pengguna dan kompleksitas data.
+
+---
+
+## Komponen Utama Arsitektur Data Pipeline Canva
+
+Pipeline data Canva terdiri dari beberapa komponen inti yang saling terintegrasi secara modular untuk fleksibilitas dan skalabilitas tinggi.
+
+### 1. **Schema Berbasis Protobuf**
+
+Setiap event yang masuk ke pipeline mengikuti schema yang terdokumentasi dengan baik menggunakan **Protocol Buffers (Protobuf)**. Ini memungkinkan validasi tipe yang ketat dan kompatibilitas antar versi.
+
+Contoh schema Protobuf:
+
+```protobuf
+syntax = "proto2";
+
+import "datumgen/datumgen.proto";
+
+package events.page;
+option (datumgen.technical_owner) = "someone@canva.com";
+option (datumgen.business_owner) = "someone@canva.com";
+
+// Fired when the user visits a page.
+message PageVisitedEventProperties {
+  option (datumgen.event_type) = "page_visited";
+
+  // The name of the page.
+  optional string page_name = 1;
+
+  // The flag indicates if the page is embedded in the iframe
+  optional bool is_iframe_embedded = 2;
+}
+```
+
+**Keuntungan menggunakan Protobuf:**
+- **Backward & Forward Compatibility:** Mendukung perubahan schema tanpa mengganggu data yang sudah ada.
+- **Validation at Compile Time:** Meminimalkan error saat runtime dengan validasi sejak awal.
+
+### 2. **Datumgen: Alat Generasi Schema Otomatis**
+
+Untuk mempercepat pengelolaan schema, Canva membangun **Datumgen**, sebuah tool berbasis `protoc` untuk menghasilkan berbagai output, seperti:
+
+- **TypeScript** untuk validasi di frontend.
+- **Java** untuk backend processing.
+- **SQL** untuk schema di Snowflake.
+- **Event Catalog** untuk dokumentasi schema yang dapat diakses tim internal.
+
+<table>
+  <thead>
+    <tr>
+      <th>Output</th>
+      <th>Deskripsi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TypeScript</td>
+      <td>Digunakan untuk validasi schema di frontend.</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>Pengelolaan event processing di backend.</td>
+    </tr>
+    <tr>
+      <td>SQL</td>
+      <td>Digunakan untuk definisi tabel di data warehouse.</td>
+    </tr>
+    <tr>
+      <td>Event Catalog</td>
+      <td>UI untuk eksplorasi schema event.</td>
+    </tr>
+  </tbody>
+</table>
+
+### 3. **AWS Kinesis Data Stream (KDS) untuk Data Collection**
+
+Data pipeline Canva menggunakan **AWS Kinesis Data Stream** untuk ingestion data dengan throughput tinggi. Dengan kompresi **zstd**, Canva berhasil:
+
+- Mengurangi ukuran payload hingga **10x**.
+- Menghemat hingga **$600.000 per tahun** dalam biaya AWS.
+
+Selain itu, fallback ke **SQS** memastikan latensi tetap rendah dengan biaya tambahan hanya sekitar **$100/bulan**.
+
+### 4. **Router untuk Distribusi Data**
+
+Router mendistribusikan data ke konsumen seperti Snowflake, Elasticsearch, dan internal services lainnya. Konfigurasi ini sepenuhnya centralized, sehingga mudah menambahkan konsumen baru tanpa mengganggu konsumen yang sudah ada.
+
+**Keunggulan desain ini:**
+- **Modular & Scalable:** Routing logic dipisahkan dari worker utama.
+- **Dynamic Prioritization:** Konsumen dengan prioritas lebih tinggi dapat diproses terlebih dahulu.
+
+---
+
+## Optimasi Biaya dan Performa
+
+Tim Canva melakukan berbagai optimasi untuk mencapai efisiensi biaya dan performa maksimal, di antaranya:
+
+1. **Migrasi dari SQS/SNS ke KDS:** Mengurangi biaya hingga **20x**.
+2. **Kompresi Data dengan zstd:** Mengurangi bandwidth usage secara signifikan.
+3. **Fallback ke SQS:** Solusi hemat biaya untuk mengatasi latensi pada KDS.
+
+---
+
+## Kesimpulan
+
+Arsitektur data pipeline Canva menunjukkan bagaimana sistem yang scalable, reliable, dan cost-efficient dapat dibangun untuk menangani volume data skala besar. Dengan pendekatan berbasis schema, otomatisasi seperti Datumgen, dan optimasi biaya, Canva berhasil menciptakan ekosistem data yang menjadi backbone pengambilan keputusan berbasis data.
+
+Jika Anda ingin membangun pipeline serupa, mulailah dengan desain berbasis schema yang solid, fokus pada modularitas, dan selalu optimalkan setiap tahap alur data.
