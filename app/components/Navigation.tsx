@@ -43,6 +43,7 @@ const NavLink = memo(function NavLink({ section, pathname, isMobile = false }: N
 
   return (
     <Link
+      rel={isMobile ? 'noopener noreferrer' : 'prefetch'}
       href={href}
       prefetch={true}
       className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
