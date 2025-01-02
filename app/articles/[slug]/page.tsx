@@ -30,6 +30,9 @@ const getMetadata = cache(async (slug: string) => {
     keywords: meta.keywords,
     authors: [{ name: 'Hafizh Pratama' }],
     creator: 'Hafizh Pratama',
+    alternates: {
+      canonical: `https://hafizh.pages.dev/articles/${slug}`,
+    },
   } as Metadata;
 });
 
