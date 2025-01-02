@@ -3,10 +3,8 @@ import path from 'path';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
 
-// Define the articles directory relative to the app directory
 const articlesDirectory = path.join(process.cwd(), 'content/articles');
 
-// Create the directory if it doesn't exist
 try {
   if (!fs.existsSync(articlesDirectory)) {
     fs.mkdirSync(articlesDirectory, { recursive: true });
@@ -59,7 +57,6 @@ export async function getArticleBySlug(slug: string) {
 
 export async function getAllArticles() {
   try {
-    // If the directory doesn't exist, return empty array
     if (!fs.existsSync(articlesDirectory)) {
       return [];
     }
@@ -74,7 +71,6 @@ export async function getAllArticles() {
         })
     );
 
-    // Sort articles by date in descending order
     return articles.sort((a, b) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });

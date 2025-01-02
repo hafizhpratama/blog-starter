@@ -28,12 +28,10 @@ const themeScript = `
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useLocalStorage<Theme>('theme', 'light');
 
-  // Memoize the toggle function
   const toggleTheme = useCallback(() => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   }, [setTheme]);
 
-  // Handle system theme changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
@@ -46,12 +44,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setTheme]);
 
-  // Handle theme class
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
-  // Memoize context value
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
   return (

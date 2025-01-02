@@ -1,18 +1,15 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import { ArticleLayout } from '@/app/components/ArticleLayout';
 import { getAllArticles, getArticleBySlug } from '@/app/lib/mdx';
 import { generateOpenMojiUrl } from '@/lib/utils';
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 
-interface ArticlePageProps {
-  params: {
-    slug: string;
-  };
-}
-
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const { meta } = await getArticleBySlug(params.slug);
-
+const getMetadata = cache(async (slug: string) => {
+  const { meta } = await getArticleBySlug(slug);
+  
+  const openMojiUrl = generateOpenMojiUrl(meta.emoji);
+  
   return {
     title: meta.title,
     description: meta.description,
@@ -22,35 +19,61 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       type: 'article',
       publishedTime: meta.date,
       authors: ['Hafizh Pratama'],
-      images: [generateOpenMojiUrl(meta.emoji)],
+      images: [openMojiUrl],
     },
     twitter: {
       card: 'summary_large_image',
       title: meta.title,
       description: meta.description,
-      images: [generateOpenMojiUrl(meta.emoji)],
+      images: [openMojiUrl],
     },
     keywords: meta.keywords,
     authors: [{ name: 'Hafizh Pratama' }],
     creator: 'Hafizh Pratama',
+  } as Metadata;
+});
+
+const getArticleData = cache(async (slug: string) => {
+  try {
+    return await getArticleBySlug(slug);
+  } catch {
+    return null;
+  }
+});
+
+interface ArticlePageProps {
+  params: {
+    slug: string;
   };
 }
 
-export default async function ArticlePage({ params }: ArticlePageProps) {
-  try {
-    const { meta, content } = await getArticleBySlug(params.slug);
-
-    return <ArticleLayout meta={meta}>{content}</ArticleLayout>;
-  } catch {
-    notFound();
-  }
+export async function generateMetadata({ params }: ArticlePageProps) {
+  return getMetadata(params.slug);
 }
 
+export default async function ArticlePage({ params }: ArticlePageProps) {
+  const article = await getArticleData(params.slug);
+  
+  if (!article) {
+    notFound();
+  }
 
-export async function generateStaticParams() {
+  const { meta, content } = article;
+
+  return (
+    <ArticleLayout meta={meta}>
+      {content}
+    </ArticleLayout>
+  );
+}
+
+const getAllArticleSlugs = cache(async () => {
   const articles = await getAllArticles();
   return articles.map((article) => ({
     slug: article.slug,
   }));
-}
+});
 
+export async function generateStaticParams() {
+  return getAllArticleSlugs();
+}

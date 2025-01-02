@@ -35,15 +35,13 @@ function SlotReel({
   stopDelay: number
 }) {
   const generateReelSymbols = () => {
-    const fullSetCount = 4; // Number of complete symbol sets
+    const fullSetCount = 4;
     let symbols = [startSymbol];
     
-    // Add complete sets of symbols
     for (let i = 0; i < fullSetCount; i++) {
       symbols = [...symbols, ...emojis];
     }
     
-    // Add symbols up to and including the final symbol
     const finalIndex = emojis.indexOf(finalSymbol);
     if (finalIndex !== -1) {
       symbols = [...symbols, ...emojis.slice(0, finalIndex + 1)];
@@ -67,7 +65,7 @@ function SlotReel({
             y: [0, finalPosition],
             transition: {
               duration: 2,
-              ease: [0.45, 0.05, 0.55, 0.95], // Custom easing for more realistic slot machine feel
+              ease: [0.45, 0.05, 0.55, 0.95],
               delay: stopDelay,
             }
           } : {
@@ -149,15 +147,12 @@ export default function SlotMachine() {
     setBalance(prev => prev - SPIN_COST)
     setLastWin(0)
 
-    // Generate new final symbols
     const results = Array.from({ length: 3 }, () => 
       emojis[Math.floor(Math.random() * emojis.length)]
     )
     setFinalSymbols(results)
 
-    // Wait for all reels to stop
     setTimeout(() => {
-      // Save the results as the starting position for next spin
       setStartSymbols(results)
       setHasSpunOnce(true)
 
@@ -177,7 +172,7 @@ export default function SlotMachine() {
       setShowWinPopup(true);
       const timer = setTimeout(() => {
         setShowWinPopup(false);
-      }, 2000); // Hide after 2 seconds
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [lastWin]);
@@ -234,7 +229,7 @@ export default function SlotMachine() {
             animate={{ opacity: 1 }}
             className="w-full p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-neutral-200 dark:border-gray-700"
           >
-             <p className="text-sm text-neutral-500 dark:text-gray-400 mb-2">Prize</p>
+            <p className="text-sm text-neutral-500 dark:text-gray-400 mb-2">Prize</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(WINNING_COMBINATIONS).map(([combo, prize]) => (
