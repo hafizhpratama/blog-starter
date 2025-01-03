@@ -1,11 +1,11 @@
-import { smMetadata } from '@/app/metadata'
+import { smMetadata } from "../../metadata";
 
-export const metadata = smMetadata
+export const metadata = smMetadata;
 
 export default function SlotMachineLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  return <>{children}</>
+  return <>{children}</>;
 }

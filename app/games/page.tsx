@@ -1,63 +1,61 @@
-import { ExternalLink, Link2 } from 'lucide-react';
-import { GAMES } from '../constants';
-import { defaultMetadata } from '../metadata';
+import { ExternalLink, Link2 } from "lucide-react";
+import { GAMES } from "../constants";
+import { defaultMetadata } from "../metadata";
 
-export const metadata = defaultMetadata
+export const metadata = defaultMetadata;
 
 export default function GamesPage() {
   return (
-    <main className="pt-24 pb-16 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-serif italic mb-12 text-center">
+    <main className="px-4 pb-16 pt-24 sm:px-6">
+      <div className="mx-auto max-w-5xl">
+        <h2 className="mb-12 text-center font-serif text-3xl italic sm:text-4xl">
           Games
         </h2>
         <div className="grid gap-8 md:grid-cols-2">
           {GAMES.map((game, index) => (
             <div
               key={index}
-              className="rounded-xl p-6 transition-all hover:scale-105 transform
-                bg-white dark:bg-gray-800 border border-neutral-200 dark:border-gray-700
-                hover:border-gray-200 dark:hover:border-gray-600 
-                shadow-sm hover:shadow-md"
+              className="transform rounded-xl border border-neutral-200 bg-white
+                p-6 shadow-sm transition-all hover:scale-105 hover:border-gray-200
+                hover:shadow-md dark:border-gray-700 
+                dark:bg-gray-800 dark:hover:border-gray-600"
             >
-              <div className="text-4xl mb-4">{game.emoji}</div>
-              <h3 className="text-xl font-semibold mb-3">
-                {game.title}
-              </h3>
+              <div className="mb-4 text-4xl">{game.emoji}</div>
+              <h3 className="mb-3 text-xl font-semibold">{game.title}</h3>
               <p className="mb-6 text-gray-600 dark:text-gray-300">
                 {game.description}
               </p>
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="mb-6 flex flex-wrap gap-2">
                 {game.tags.map((tag, tagIndex) => (
                   <span
                     key={tagIndex}
-                    className="px-3 py-1 rounded-full text-sm
-                      bg-gray-100 dark:bg-gray-700 
-                      text-gray-700 dark:text-gray-300"
+                    className="rounded-full bg-gray-100 px-3 py-1
+                      text-sm text-gray-700 
+                      dark:bg-gray-700 dark:text-gray-300"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
               <div className="flex space-x-6">
-              {game.sourceCode && (
+                {game.sourceCode && (
+                  <a
+                    href={game.sourceCode}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center transition-colors hover:text-blue-500"
+                  >
+                    <Link2 className="mr-2 h-4 w-4" />
+                    <span className="text-sm">Source</span>
+                  </a>
+                )}
                 <a
-                  href={game.sourceCode}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-blue-500 transition-colors"
+                  href={game.link}
+                  className="flex items-center transition-colors hover:text-blue-500"
                 >
-                 <Link2 className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Source</span>
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  <span className="text-sm">Demo</span>
                 </a>
-              )}
-              <a
-                href={game.link}
-                className="flex items-center hover:text-blue-500 transition-colors"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                <span className="text-sm">Demo</span>
-              </a>
               </div>
             </div>
           ))}

@@ -1,16 +1,16 @@
-import { getAllArticles } from '../lib/mdx';
-import { defaultMetadata } from '../metadata';
-import ArticlesList from './components/ArticlesList';
+import { getAllArticles } from "../lib/mdx";
+import { defaultMetadata } from "../metadata";
+import ArticlesList from "./components/ArticlesList";
 
-export const metadata = defaultMetadata
+export const metadata = defaultMetadata;
 
 export default async function ArticlesPage() {
   const articles = await getAllArticles();
 
   return (
-    <main className="pt-24 pb-16 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-serif italic mb-12 text-center">
+    <main className="px-4 pb-16 pt-24 sm:px-6">
+      <div className="mx-auto max-w-5xl">
+        <h2 className="mb-12 text-center font-serif text-3xl italic sm:text-4xl">
           Articles
         </h2>
         <ArticlesList initialArticles={articles} />

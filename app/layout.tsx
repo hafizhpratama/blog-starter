@@ -1,48 +1,48 @@
-import { Inter, Crimson_Text } from 'next/font/google';
-import type { Metadata } from 'next';
-import './globals.css';
-import { ThemeProvider } from './context/ThemeContext';
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { Inter, Crimson_Text } from "next/font/google";
+import type { Metadata } from "next";
+import "./globals.css";
+import { ThemeProvider } from "./context/ThemeContext";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
 const inter = Inter({
-  weight: ['400'], 
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
   preload: true,
-  fallback: ['system-ui', '-apple-system', 'arial'], 
+  fallback: ["system-ui", "-apple-system", "arial"],
 });
 
 const crimson = Crimson_Text({
-  weight: ['400'],
-  subsets: ['latin'],
-  variable: '--font-crimson',
-  display: 'swap',
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-crimson",
+  display: "swap",
   preload: true,
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://hafizh.pages.dev'),
+  metadataBase: new URL("https://hafizh.pages.dev"),
   title: {
-    template: '%s | Hafizh Pratama',
-    default: 'Hafizh Pratama - Software Engineer',
+    template: "%s | Hafizh Pratama",
+    default: "Hafizh Pratama - Software Engineer",
   },
-  description: 'Software engineer focused on creating elegant solutions.',
+  description: "Software engineer focused on creating elegant solutions.",
   openGraph: {
-    title: 'Hafizh Pratama - Software Engineer',
-    description: 'Software engineer focused on creating elegant solutions.',
-    url: 'https://hafizh.pages.dev',
-    siteName: 'Hafizh Pratama',
-    locale: 'en_US',
-    type: 'website',
+    title: "Hafizh Pratama - Software Engineer",
+    description: "Software engineer focused on creating elegant solutions.",
+    url: "https://hafizh.pages.dev",
+    siteName: "Hafizh Pratama",
+    locale: "en_US",
+    type: "website",
     images: [
       {
-        url: '/logo.png',
+        url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: 'Hafizh Pratama',
+        alt: "Hafizh Pratama",
       },
     ],
   },
@@ -52,30 +52,26 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-image-preview': 'large',
+      "max-image-preview": "large",
     },
   },
   alternates: {
-    canonical: 'https://hafizh.pages.dev',
+    canonical: "https://hafizh.pages.dev",
   },
 };
 
-const LoadingNavigation = () => (
-  <div className="h-14 bg-muted animate-pulse" />
-);
+const LoadingNavigation = () => <div className="h-14 animate-pulse bg-muted" />;
 
-const LoadingFooter = () => (
-  <div className="h-12 bg-muted animate-pulse" />
-);
+const LoadingFooter = () => <div className="h-12 animate-pulse bg-muted" />;
 
-const Navigation = dynamic(() => import('./components/Navigation'), {
+const Navigation = dynamic(() => import("./components/Navigation"), {
   ssr: true,
-  loading: LoadingNavigation
+  loading: LoadingNavigation,
 });
 
-const Footer = dynamic(() => import('./components/Footer'), {
+const Footer = dynamic(() => import("./components/Footer"), {
   ssr: true,
-  loading: LoadingFooter
+  loading: LoadingFooter,
 });
 
 export default function RootLayout({
@@ -84,19 +80,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html 
-      lang="en" 
-      suppressHydrationWarning 
+    <html
+      lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${crimson.variable}`}
     >
-      <body className="antialiased flex min-h-screen flex-col bg-background text-foreground">
+      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
         <ThemeProvider>
           <Suspense fallback={<LoadingNavigation />}>
             <Navigation />
           </Suspense>
-          <main className="flex-1">
-            {children}
-          </main>
+          <main className="flex-1">{children}</main>
           <Suspense fallback={<LoadingFooter />}>
             <Footer />
           </Suspense>

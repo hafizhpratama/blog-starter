@@ -1,11 +1,11 @@
-import { rpsMetadata } from '@/app/metadata'
+import { rpsMetadata } from "../../metadata";
 
-export const metadata = rpsMetadata
+export const metadata = rpsMetadata;
 
 export default function RockPaperScissorsLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  return <>{children}</>
+  return <>{children}</>;
 }

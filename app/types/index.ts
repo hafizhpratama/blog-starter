@@ -1,4 +1,4 @@
-export type Section = 'home' | 'projects' | 'articles' | 'games';
+export type Section = "home" | "projects" | "articles" | "games";
 
 export interface Project {
   title: string;
@@ -20,7 +20,7 @@ export interface Game {
 
 export interface Skill {
   name: string;
-  category: 'frontend' | 'backend' | 'devops' | 'other';
+  category: "frontend" | "backend" | "devops" | "other";
 }
 
 export interface Experience {

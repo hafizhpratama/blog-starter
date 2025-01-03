@@ -1,35 +1,35 @@
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { cache } from 'react';
-import { ArticleLayout } from '@/app/components/ArticleLayout';
-import { getAllArticles, getArticleBySlug } from '@/app/lib/mdx';
-import { generateOpenMojiUrl } from '@/lib/utils';
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { getAllArticles, getArticleBySlug } from "../../lib/mdx";
+import { generateOpenMojiUrl } from "../../../lib/utils";
+import { ArticleLayout } from "../../components/ArticleLayout";
 
 const getMetadata = cache(async (slug: string) => {
   const { meta } = await getArticleBySlug(slug);
-  
+
   const openMojiUrl = generateOpenMojiUrl(meta.emoji);
-  
+
   return {
     title: meta.title,
     description: meta.description,
     openGraph: {
       title: meta.title,
       description: meta.description,
-      type: 'article',
+      type: "article",
       publishedTime: meta.date,
-      authors: ['Hafizh Pratama'],
+      authors: ["Hafizh Pratama"],
       images: [openMojiUrl],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: meta.title,
       description: meta.description,
       images: [openMojiUrl],
     },
     keywords: meta.keywords,
-    authors: [{ name: 'Hafizh Pratama' }],
-    creator: 'Hafizh Pratama',
+    authors: [{ name: "Hafizh Pratama" }],
+    creator: "Hafizh Pratama",
     alternates: {
       canonical: `https://hafizh.pages.dev/articles/${slug}`,
     },
@@ -56,18 +56,14 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const article = await getArticleData(params.slug);
-  
+
   if (!article) {
     notFound();
   }
 
   const { meta, content } = article;
 
-  return (
-    <ArticleLayout meta={meta}>
-      {content}
-    </ArticleLayout>
-  );
+  return <ArticleLayout meta={meta}>{content}</ArticleLayout>;
 }
 
 const getAllArticleSlugs = cache(async () => {

@@ -5,21 +5,21 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Experience } from "../types";
 
 const ExperienceCard = memo(({ exp }: { exp: Experience }) => (
-  <div className="flex-shrink-0 w-[280px] sm:w-[340px] snap-center">
+  <div className="w-[280px] flex-shrink-0 snap-center sm:w-[340px]">
     <div
-      className="h-full bg-card rounded-xl border border-neutral-200
-                dark:bg-gray-800 dark:border-gray-700 p-6 hover:border-neutral-300 
-                dark:hover:border-gray-600 transition-colors"
+      className="h-full rounded-xl border border-neutral-200 bg-card
+                p-6 transition-colors hover:border-neutral-300 dark:border-gray-700 
+                dark:bg-gray-800 dark:hover:border-gray-600"
     >
-      <div className="flex flex-col h-full">
+      <div className="flex h-full flex-col">
         <div className="mb-4">
           <span className="text-4xl">{exp.emoji}</span>
         </div>
         <div className="flex-grow">
-          <h3 className="text-lg font-semibold mb-1">{exp.company}</h3>
-          <p className="font-medium text-sm mb-1">{exp.position}</p>
-          <p className="text-sm text-muted-foreground mb-4">{exp.period}</p>
-          <p className="text-sm text-muted-foreground mb-6">
+          <h3 className="mb-1 text-lg font-semibold">{exp.company}</h3>
+          <p className="mb-1 text-sm font-medium">{exp.position}</p>
+          <p className="mb-4 text-sm text-muted-foreground">{exp.period}</p>
+          <p className="mb-6 text-sm text-muted-foreground">
             {exp.description}
           </p>
         </div>
@@ -27,7 +27,7 @@ const ExperienceCard = memo(({ exp }: { exp: Experience }) => (
           {exp.technologies.map((tech: string, idx: number) => (
             <span
               key={idx}
-              className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105 transform bg-accent text-accent-foreground"
+              className="transform rounded-full bg-accent px-4 py-2 text-sm text-accent-foreground transition-all hover:scale-105"
             >
               {tech}
             </span>
@@ -58,33 +58,33 @@ const ExperienceSection = memo(function ExperienceSection({
   }, []);
 
   return (
-    <div className="mt-24 mb-16">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-serif italic">
+    <div className="mb-16 mt-24">
+      <div className="mx-auto max-w-5xl px-4">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="font-serif text-2xl italic sm:text-3xl">
             Work Experience
           </h2>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => scroll("left")}
               aria-label="Scroll left"
-              className="p-2 hover:bg-accent rounded-full transition-colors"
+              className="rounded-full p-2 transition-colors hover:bg-accent"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => scroll("right")}
               aria-label="Scroll right"
-              className="p-2 hover:bg-accent rounded-full transition-colors"
+              className="rounded-full p-2 transition-colors hover:bg-accent"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
 
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar focus:outline-none"
+          className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 focus:outline-none"
           tabIndex={0}
           style={{
             msOverflowStyle: "none",

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { memo, useCallback, useState, useEffect } from 'react';
-import { Moon, Sun, Menu, X } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import type { Section } from '../types';
-import { useTheme } from '../context/ThemeContext';
+import { memo, useCallback, useState, useEffect } from "react";
+import { Moon, Sun, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import type { Section } from "../types";
+import { useTheme } from "../context/ThemeContext";
 
-const SECTIONS: Section[] = ['home', 'projects', 'articles', 'games'];
+const SECTIONS: Section[] = ["home", "projects", "articles", "games"];
 
 interface NavLinkProps {
   section: Section;
@@ -15,21 +15,25 @@ interface NavLinkProps {
   isMobile?: boolean;
 }
 
-const NavLink = memo(function NavLink({ section, pathname, isMobile = false }: NavLinkProps) {
-  const href = section === 'home' ? '/' : `/${section}`;
+const NavLink = memo(function NavLink({
+  section,
+  pathname,
+  isMobile = false,
+}: NavLinkProps) {
+  const href = section === "home" ? "/" : `/${section}`;
   const isActive = pathname === href;
-  
+
   return (
     <Link
       href={href}
       className={`
-        ${isMobile ? 'block w-full px-4 py-2 rounded-lg capitalize' : 'relative text-sm font-medium capitalize'}
-        ${isActive 
-          ? (isMobile 
-              ? 'bg-primary text-primary-foreground' 
-              : 'text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary'
-            )
-          : 'text-muted-foreground hover:text-foreground'
+        ${isMobile ? "block w-full rounded-lg px-4 py-2 capitalize" : "relative text-sm font-medium capitalize"}
+        ${
+          isActive
+            ? isMobile
+              ? "bg-primary text-primary-foreground"
+              : "text-primary after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-primary"
+            : "text-muted-foreground hover:text-foreground"
         }
       `}
     >
@@ -37,14 +41,14 @@ const NavLink = memo(function NavLink({ section, pathname, isMobile = false }: N
     </Link>
   );
 });
-NavLink.displayName = 'NavLink';
+NavLink.displayName = "NavLink";
 
-const ThemeToggle = memo(function ThemeToggle({ 
-  theme, 
-  toggleTheme 
-}: { 
-  theme: string; 
-  toggleTheme: () => void; 
+const ThemeToggle = memo(function ThemeToggle({
+  theme,
+  toggleTheme,
+}: {
+  theme: string;
+  toggleTheme: () => void;
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -53,23 +57,24 @@ const ThemeToggle = memo(function ThemeToggle({
   }, []);
 
   if (!mounted) {
-    return <button className="w-10 h-10" aria-hidden="true" />;
+    return <button className="h-10 w-10" aria-hidden="true" />;
   }
 
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full hover:bg-accent"
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      className="rounded-full p-2 hover:bg-accent"
+      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
-      {theme === 'dark' 
-        ? <Sun className="w-5 h-5" /> 
-        : <Moon className="w-5 h-5" />
-      }
+      {theme === "dark" ? (
+        <Sun className="h-5 w-5" />
+      ) : (
+        <Moon className="h-5 w-5" />
+      )}
     </button>
   );
 });
-ThemeToggle.displayName = 'ThemeToggle';
+ThemeToggle.displayName = "ThemeToggle";
 
 function Navigation() {
   const { theme, toggleTheme } = useTheme();
@@ -77,17 +82,17 @@ function Navigation() {
   const pathname = usePathname();
 
   const handleToggleMenu = useCallback(() => {
-    setIsMenuOpen(prev => !prev);
+    setIsMenuOpen((prev) => !prev);
   }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsMenuOpen(false);
+      if (e.key === "Escape") setIsMenuOpen(false);
     };
 
     if (isMenuOpen) {
-      window.addEventListener('keydown', handleEscape);
-      return () => window.removeEventListener('keydown', handleEscape);
+      window.addEventListener("keydown", handleEscape);
+      return () => window.removeEventListener("keydown", handleEscape);
     }
   }, [isMenuOpen]);
 
@@ -96,31 +101,28 @@ function Navigation() {
   }, [pathname]);
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-background/80 border-b border-border backdrop-blur-sm">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex justify-between items-center h-14">
+    <nav className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
+      <div className="mx-auto max-w-4xl px-4">
+        <div className="flex h-14 items-center justify-between">
           {/* Desktop navigation */}
           <div className="hidden md:flex md:space-x-6">
             {SECTIONS.map((section) => (
-              <NavLink 
-                key={section} 
-                section={section} 
-                pathname={pathname} 
-              />
+              <NavLink key={section} section={section} pathname={pathname} />
             ))}
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={handleToggleMenu}
-            className="md:hidden p-2 rounded-lg hover:bg-accent"
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            className="rounded-lg p-2 hover:bg-accent md:hidden"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMenuOpen}
           >
-            {isMenuOpen 
-              ? <X className="w-5 h-5" /> 
-              : <Menu className="w-5 h-5" />
-            }
+            {isMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
 
           <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
@@ -128,16 +130,14 @@ function Navigation() {
       </div>
 
       {/* Mobile menu */}
-      <div
-        className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}
-      >
-        <div className="px-4 py-2 border-t border-border">
+      <div className={`md:hidden ${isMenuOpen ? "block" : "hidden"}`}>
+        <div className="border-t border-border px-4 py-2">
           {SECTIONS.map((section) => (
-            <NavLink 
-              key={section} 
-              section={section} 
+            <NavLink
+              key={section}
+              section={section}
               pathname={pathname}
-              isMobile 
+              isMobile
             />
           ))}
         </div>

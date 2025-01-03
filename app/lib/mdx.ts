@@ -1,16 +1,16 @@
-import fs from 'fs';
-import path from 'path';
-import { compileMDX } from 'next-mdx-remote/rsc';
-import { notFound } from 'next/navigation';
+import fs from "fs";
+import path from "path";
+import { compileMDX } from "next-mdx-remote/rsc";
+import { notFound } from "next/navigation";
 
-const articlesDirectory = path.join(process.cwd(), 'content/articles');
+const articlesDirectory = path.join(process.cwd(), "content/articles");
 
 try {
   if (!fs.existsSync(articlesDirectory)) {
     fs.mkdirSync(articlesDirectory, { recursive: true });
   }
 } catch (error) {
-  console.error('Error creating articles directory:', error);
+  console.error("Error creating articles directory:", error);
 }
 
 interface ArticleMeta {
@@ -26,14 +26,14 @@ interface ArticleMeta {
 
 export async function getArticleBySlug(slug: string) {
   try {
-    const realSlug = slug.replace(/\.mdx$/, '');
+    const realSlug = slug.replace(/\.mdx$/, "");
     const filePath = path.join(articlesDirectory, `${realSlug}.mdx`);
 
     if (!fs.existsSync(filePath)) {
       return notFound();
     }
 
-    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const fileContent = fs.readFileSync(filePath, "utf8");
 
     const { content, frontmatter } = await compileMDX<ArticleMeta>({
       source: fileContent,
@@ -50,7 +50,7 @@ export async function getArticleBySlug(slug: string) {
       content,
     };
   } catch (error) {
-    console.error('Error reading article:', error);
+    console.error("Error reading article:", error);
     return notFound();
   }
 }
@@ -64,7 +64,7 @@ export async function getAllArticles() {
     const files = fs.readdirSync(articlesDirectory);
     const articles = await Promise.all(
       files
-        .filter((file) => file.endsWith('.mdx'))
+        .filter((file) => file.endsWith(".mdx"))
         .map(async (file) => {
           const { meta } = await getArticleBySlug(file);
           return meta;
@@ -75,7 +75,7 @@ export async function getAllArticles() {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
   } catch (error) {
-    console.error('Error getting all articles:', error);
+    console.error("Error getting all articles:", error);
     return [];
   }
 }

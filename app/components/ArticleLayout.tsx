@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface ArticleMeta {
   title: string;
@@ -16,16 +16,16 @@ interface ArticleLayoutProps {
 export function ArticleLayout({ meta, children }: ArticleLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 mt-16">
-        <article className="prose dark:prose-invert lg:prose-lg mx-auto">
-          <div className="text-center mb-12">
-            <span className="text-6xl sm:text-7xl mb-6 block">
+      <div className="mx-auto mt-16 max-w-3xl px-4 py-8 sm:px-6">
+        <article className="prose mx-auto dark:prose-invert lg:prose-lg">
+          <div className="mb-12 text-center">
+            <span className="mb-6 block text-6xl sm:text-7xl">
               {meta.emoji}
             </span>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+            <h1 className="mb-4 text-3xl font-bold sm:text-4xl">
               {meta.title}
             </h1>
-            <div className="flex flex-wrap justify-center items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
               <span>{meta.date}</span>
               <span>•</span>
               <span>{meta.readTime}</span>

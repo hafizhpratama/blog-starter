@@ -4,7 +4,7 @@ import { Mail, Twitter, Linkedin, Github, type LucideIcon } from "lucide-react";
 import { EXPERIENCES, SKILLS, SOCIAL_LINKS } from "./constants";
 
 const SkeletonLoader = memo(({ className = "" }: { className?: string }) => (
-  <div className={`bg-muted/50 rounded ${className}`} />
+  <div className={`rounded bg-muted/50 ${className}`} />
 ));
 SkeletonLoader.displayName = "SkeletonLoader";
 
@@ -23,16 +23,16 @@ const SocialLink = memo(
       aria-label={name}
       target="_blank"
       rel="noopener noreferrer"
-      className="p-2 rounded-full hover:bg-accent"
+      className="rounded-full p-2 hover:bg-accent"
     >
-      <Icon className="w-5 h-5" aria-hidden="true" />
+      <Icon className="h-5 w-5" aria-hidden="true" />
     </a>
   )
 );
 SocialLink.displayName = "SocialLink";
 
 const SkillBadge = memo(({ name }: { name: string }) => (
-  <span className="px-3 py-1 rounded-full text-sm bg-accent text-accent-foreground">
+  <span className="rounded-full bg-accent px-3 py-1 text-sm text-accent-foreground">
     {name}
   </span>
 ));
@@ -47,19 +47,19 @@ const socialLinks = [
 
 const HeroSection = memo(() => (
   <div className="mb-24">
-    <div role="img" aria-label="developer emoji" className="text-6xl mb-6">
+    <div role="img" aria-label="developer emoji" className="mb-6 text-6xl">
       🧑🏻‍💻
     </div>
-    <h1 className="text-3xl sm:text-4xl font-serif italic mb-6">
+    <h1 className="mb-6 font-serif text-3xl italic sm:text-4xl">
       Hello, I&apos;m Hafizh Pratama
     </h1>
-    <p className="text-base sm:text-lg mb-6 max-w-xl mx-auto text-muted-foreground">
+    <p className="mx-auto mb-6 max-w-xl text-base text-muted-foreground sm:text-lg">
       A software engineer who enjoys solving problems, building efficient
       systems, and continuously learning. Focused on delivering practical
       solutions while staying humble and grounded.
     </p>
 
-    <div className="flex justify-center space-x-4 mb-6">
+    <div className="mb-6 flex justify-center space-x-4">
       {socialLinks.map(({ Icon, href, name }) => (
         <SocialLink key={name} Icon={Icon} href={href} name={name} />
       ))}
@@ -70,7 +70,7 @@ HeroSection.displayName = "HeroSection";
 
 const SkillsSection = memo(() => (
   <div className="mb-12">
-    <h2 className="text-2xl sm:text-3xl font-serif italic mb-6">
+    <h2 className="mb-6 font-serif text-2xl italic sm:text-3xl">
       Skills & Technologies
     </h2>
     <div className="flex flex-wrap justify-center gap-2">
@@ -84,9 +84,9 @@ SkillsSection.displayName = "SkillsSection";
 
 export default function HomePage() {
   return (
-    <main className="pt-24 pb-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+    <main className="px-4 pb-12 pt-24">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-12 text-center">
           <HeroSection />
           <SkillsSection />
         </div>
