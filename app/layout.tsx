@@ -29,10 +29,12 @@ export const metadata: Metadata = {
     template: "%s | Hafizh Pratama",
     default: "Hafizh Pratama - Software Engineer",
   },
-  description: "Software engineer focused on creating elegant solutions.",
+  description:
+    "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.",
   openGraph: {
     title: "Hafizh Pratama - Software Engineer",
-    description: "Software engineer focused on creating elegant solutions.",
+    description:
+      "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.",
     url: "https://hafizh.pages.dev",
     siteName: "Hafizh Pratama",
     locale: "en_US",

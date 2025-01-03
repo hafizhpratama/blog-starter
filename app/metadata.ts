@@ -9,7 +9,7 @@ const defaultKeywords = [
 ];
 
 const defaultDescription =
-  "Hafizh Pratama is a passionate software engineer focused on creating elegant solutions through clean code and thoughtful design.";
+  "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.";
 
 export const defaultMetadata: Metadata = {
   metadataBase: new URL("https://hafizh.pages.dev"),
