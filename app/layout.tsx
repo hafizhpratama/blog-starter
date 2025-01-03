@@ -6,9 +6,10 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
 const inter = Inter({
+  weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap',
+  display: 'optional',
   preload: true,
   fallback: ['system-ui', 'arial'],
   adjustFontFallback: true,
@@ -108,6 +109,7 @@ export default function RootLayout({
     >
       <head>
         <style 
+          rel='stylesheet'
           id="critical-css" 
           dangerouslySetInnerHTML={{ __html: criticalStyles }} 
         />

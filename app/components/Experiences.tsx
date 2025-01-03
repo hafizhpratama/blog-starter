@@ -84,7 +84,8 @@ const ExperienceSection = memo(function ExperienceSection({
 
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar"
+          className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar focus:outline-none"
+          tabIndex={0}
           style={{
             msOverflowStyle: "none",
             scrollbarWidth: "none",
