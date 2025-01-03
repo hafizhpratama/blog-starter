@@ -2,13 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { getAllArticles, getArticleBySlug } from "../../lib/mdx";
-import { generateOpenMojiUrl } from "../../../lib/utils";
 import { ArticleLayout } from "../../components/ArticleLayout";
 
 const getMetadata = cache(async (slug: string) => {
   const { meta } = await getArticleBySlug(slug);
-
-  const openMojiUrl = generateOpenMojiUrl(meta.emoji);
 
   return {
     title: meta.title,
@@ -19,13 +16,13 @@ const getMetadata = cache(async (slug: string) => {
       type: "article",
       publishedTime: meta.date,
       authors: ["Hafizh Pratama"],
-      images: [openMojiUrl],
+      images: ["https://hafizh.pages.dev/thumbnail.png"],
     },
     twitter: {
       card: "summary_large_image",
       title: meta.title,
       description: meta.description,
-      images: [openMojiUrl],
+      images: ["https://hafizh.pages.dev/thumbnail.png"],
     },
     keywords: meta.keywords,
     authors: [{ name: "Hafizh Pratama" }],
