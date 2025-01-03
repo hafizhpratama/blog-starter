@@ -37,14 +37,7 @@ export const metadata: Metadata = {
     siteName: "Hafizh Pratama",
     locale: "en_US",
     type: "website",
-    images: [
-      {
-        url: "/thumbnail.png",
-        width: 1200,
-        height: 630,
-        alt: "Hafizh Pratama",
-      },
-    ],
+    images: ["https://hafizh.pages.dev/thumbnail.png"],
   },
   robots: {
     index: true,
