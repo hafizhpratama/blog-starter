@@ -20,6 +20,9 @@ export async function generateMetadata({
   return {
     title: meta.title,
     description: meta.description,
+    alternates: {
+      canonical: "https://hafizh.pages.dev/articles/" + params.slug,
+    },
     openGraph: {
       title: meta.title,
       description: meta.description,

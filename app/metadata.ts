@@ -43,17 +43,6 @@ export const defaultMetadata: Metadata = {
     description: defaultDescription,
     images: ["https://hafizh.pages.dev/thumbnail.png"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
 };
 
 export const rpsMetadata: Metadata = {
@@ -81,17 +70,6 @@ export const rpsMetadata: Metadata = {
     title: "Rock Paper Scissors Game",
     description: "Challenge the AI in this modern take on Rock Paper Scissors!",
     images: ["https://hafizh.pages.dev/thumbnail.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
   },
 };
 
@@ -122,16 +100,5 @@ export const smMetadata: Metadata = {
     description:
       "Try your luck with our beautifully designed slot machine game!",
     images: ["https://hafizh.pages.dev/thumbnail.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
   },
 };

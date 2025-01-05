@@ -41,17 +41,15 @@ export const metadata: Metadata = {
     type: "website",
     images: ["https://hafizh.pages.dev/thumbnail.png"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-    },
-  },
   alternates: {
     canonical: "https://hafizh.pages.dev",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hafizh Pratama - Software Engineer",
+    description:
+      "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.",
+    images: ["https://hafizh.pages.dev/thumbnail.png"],
   },
 };
 

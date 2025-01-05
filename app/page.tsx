@@ -50,7 +50,7 @@ const HeroSection = memo(() => (
     <div role="img" aria-label="developer emoji" className="mb-6 text-6xl">
       🧑🏻‍💻
     </div>
-    <h1 className="mb-6 font-serif text-3xl italic sm:text-4xl">
+    <h1 className="mb-4 font-serif text-3xl italic sm:text-4xl">
       Hello, I&apos;m Hafizh Pratama
     </h1>
     <p className="mx-auto mb-6 max-w-xl text-base text-muted-foreground sm:text-lg">
