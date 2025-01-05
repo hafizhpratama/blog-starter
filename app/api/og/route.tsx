@@ -1,40 +1,46 @@
-/* eslint-disable @next/next/no-img-element */
-// app/api/og/route.tsx
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import React from "react";
 
 export const runtime = "edge";
 
-// Load and convert the logo image
-const logoImage = fetch(
-  new URL("../../../public/logo.png", import.meta.url)
-).then(async (res) => {
-  if (!res.ok) {
-    throw new Error(`Failed to fetch logo: ${res.status} ${res.statusText}`);
-  }
-  return res.arrayBuffer();
-});
+// Theme configuration
+const themes = {
+  light: {
+    background: "#ffffff",
+    pattern: "#e2e8f0",
+    text: "#0f172a",
+    subtext: "#64748b",
+    border: "#e2e8f0",
+  },
+  dark: {
+    background: "#0f172a",
+    pattern: "#334155",
+    text: "#ffffff",
+    subtext: "#94a3b8",
+    border: "#334155",
+  },
+} as const;
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-
-    // Dynamic params with proper decoding
     const title = decodeURIComponent(
       searchParams.get("title") ?? "Hafizh Pratama"
     );
     const description = decodeURIComponent(
-      searchParams.get("description") ?? "Software Engineer"
+      searchParams.get("description") ?? "Hafizh Pratama"
     );
-    const theme = searchParams.get("theme") ?? "light";
+    const theme = (searchParams.get("theme") ?? "light") as keyof typeof themes;
 
-    // Wait for the logo to be loaded
-    const logo = await logoImage;
+    const colors = themes[theme];
 
-    // Convert ArrayBuffer to base64
-    const base64Logo = Buffer.from(logo).toString("base64");
-    const logoUrl = `data:image/png;base64,${base64Logo}`;
+    const interFont = await fetch(
+      new URL(
+        "https://fonts.cdnfonts.com/s/19795/Inter-Regular.woff",
+        "https://fonts.cdnfonts.com"
+      )
+    ).then((res) => res.arrayBuffer());
 
     return new ImageResponse(
       (
@@ -44,63 +50,31 @@ export async function GET(request: NextRequest) {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            backgroundColor: theme === "dark" ? "#1a1a1a" : "#ffffff",
+            backgroundColor: colors.background,
             padding: "48px",
           }}
         >
-          {/* Header with logo */}
+          {/* Main content wrapper */}
           <div
             style={{
               display: "flex",
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-                height: "64px",
-                width: "100px",
-              }}
-            >
-              <img
-                src={logoUrl}
-                alt="Logo"
-                style={{
-                  height: "100%",
-                  width: "100%",
-                  objectFit: "contain",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Content */}
-          <div
-            style={{
-              display: "flex",
+              flex: 1,
               flexDirection: "column",
+              justifyContent: "center",
               alignItems: "flex-start",
-              maxWidth: "800px",
-              marginTop: "-80px",
+              width: "100%",
             }}
           >
             <h1
               style={{
                 fontSize: "48px",
-                fontFamily: "Georgia, serif",
-                color: theme === "dark" ? "#ffffff" : "#000000",
+                fontFamily: "inter",
+                color: colors.text,
                 lineHeight: 1.2,
-                margin: "0 0 16px 0",
-                fontStyle: "italic",
+                margin: "0 0 24px 0",
                 maxWidth: "700px",
                 display: "flex",
+                fontWeight: 400,
               }}
             >
               {title}
@@ -108,12 +82,13 @@ export async function GET(request: NextRequest) {
             <p
               style={{
                 fontSize: "24px",
-                fontFamily: "system-ui, sans-serif",
-                color: theme === "dark" ? "#9ca3af" : "#6b7280",
+                fontFamily: "inter",
+                color: colors.subtext,
                 lineHeight: 1.5,
                 margin: 0,
                 maxWidth: "600px",
                 display: "flex",
+                fontWeight: 400,
               }}
             >
               {description}
@@ -126,17 +101,18 @@ export async function GET(request: NextRequest) {
               width: "100%",
               display: "flex",
               alignItems: "center",
-              justifyContent: "flex-end",
-              marginTop: "20px",
+              paddingTop: "20px",
+              borderTop: `1px solid ${colors.border}`,
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                fontSize: "20px",
-                fontFamily: "system-ui, sans-serif",
-                color: theme === "dark" ? "#9ca3af" : "#6b7280",
+                fontSize: "16px",
+                fontFamily: "inter",
+                color: colors.subtext,
+                fontWeight: 400,
               }}
             >
               hafizh.pages.dev
@@ -147,12 +123,18 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
+        fonts: [
+          {
+            name: "inter",
+            data: interFont,
+            weight: 400,
+            style: "normal",
+          },
+        ],
       }
     );
   } catch (e) {
     console.error(e);
-    return new Response(`Failed to generate image`, {
-      status: 500,
-    });
+    return new Response(`Failed to generate image`, { status: 500 });
   }
 }
