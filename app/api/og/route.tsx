@@ -34,7 +34,11 @@ export async function GET(request: NextRequest) {
 
     const colors = themes[theme];
 
-    const [interRegular, interBold] = await Promise.all([
+    // Get the origin from the request URL
+    const origin = new URL(request.url).origin;
+
+    // Load fonts and profile image
+    const [interRegular, interBold, profileImage] = await Promise.all([
       fetch(
         new URL(
           "https://fonts.cdnfonts.com/s/19795/Inter-Regular.woff",
@@ -47,6 +51,7 @@ export async function GET(request: NextRequest) {
           "https://fonts.cdnfonts.com"
         )
       ).then((res) => res.arrayBuffer()),
+      fetch(`${origin}/profile.jpeg`).then((res) => res.arrayBuffer()),
     ]);
 
     return new ImageResponse(
@@ -126,7 +131,7 @@ export async function GET(request: NextRequest) {
                 }}
               >
                 <img
-                  src="http://localhost:3000/profile.jpeg"
+                  src={`data:image/jpeg;base64,${Buffer.from(profileImage).toString("base64")}`}
                   width={56}
                   height={56}
                   alt="Profile"
