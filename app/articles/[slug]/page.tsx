@@ -12,8 +12,6 @@ export async function generateMetadata({
 
   const ogImageUrl = generateOGImageUrl({
     title: meta.title,
-    description: meta.description,
-    type: "article",
     theme: (process.env.NEXT_PUBLIC_THEME as "light" | "dark") || "light",
   });
 

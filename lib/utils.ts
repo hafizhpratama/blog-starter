@@ -7,13 +7,9 @@ export function cn(...inputs: ClassValue[]): string {
 
 export function generateOGImageUrl({
   title,
-  description,
-  type = "website",
   theme = "light",
 }: {
   title: string;
-  description: string;
-  type?: string;
   theme?: "light" | "dark";
 }) {
   const url = new URL(
@@ -24,8 +20,6 @@ export function generateOGImageUrl({
   );
 
   url.searchParams.set("title", title);
-  url.searchParams.set("description", description);
-  url.searchParams.set("type", type);
   url.searchParams.set("theme", theme);
 
   return url.toString();
