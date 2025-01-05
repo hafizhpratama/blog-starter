@@ -4,7 +4,6 @@ import React from "react";
 
 export const runtime = "edge";
 
-// Theme configuration
 const themes = {
   light: {
     background: "#ffffff",
@@ -28,19 +27,24 @@ export async function GET(request: NextRequest) {
     const title = decodeURIComponent(
       searchParams.get("title") ?? "Hafizh Pratama"
     );
-    const description = decodeURIComponent(
-      searchParams.get("description") ?? "Hafizh Pratama"
-    );
     const theme = (searchParams.get("theme") ?? "light") as keyof typeof themes;
 
     const colors = themes[theme];
 
-    const interFont = await fetch(
-      new URL(
-        "https://fonts.cdnfonts.com/s/19795/Inter-Regular.woff",
-        "https://fonts.cdnfonts.com"
-      )
-    ).then((res) => res.arrayBuffer());
+    const [interRegular, interBold] = await Promise.all([
+      fetch(
+        new URL(
+          "https://fonts.cdnfonts.com/s/19795/Inter-Regular.woff",
+          "https://fonts.cdnfonts.com"
+        )
+      ).then((res) => res.arrayBuffer()),
+      fetch(
+        new URL(
+          "https://fonts.cdnfonts.com/s/19795/Inter-Bold.woff",
+          "https://fonts.cdnfonts.com"
+        )
+      ).then((res) => res.arrayBuffer()),
+    ]);
 
     return new ImageResponse(
       (
@@ -52,6 +56,10 @@ export async function GET(request: NextRequest) {
             flexDirection: "column",
             backgroundColor: colors.background,
             padding: "48px",
+            backgroundImage:
+              `radial-gradient(circle at 25px 25px, ${colors.pattern} 2%, transparent 0%), ` +
+              `radial-gradient(circle at 75px 75px, ${colors.pattern} 2%, transparent 0%)`,
+            backgroundSize: "100px 100px",
           }}
         >
           {/* Main content wrapper */}
@@ -74,7 +82,7 @@ export async function GET(request: NextRequest) {
                 margin: "0 0 24px 0",
                 maxWidth: "700px",
                 display: "flex",
-                fontWeight: 400,
+                fontWeight: 700,
               }}
             >
               {title}
@@ -91,7 +99,7 @@ export async function GET(request: NextRequest) {
                 fontWeight: 400,
               }}
             >
-              {description}
+              {"Hafizh Pratama"}
             </p>
           </div>
 
@@ -126,8 +134,14 @@ export async function GET(request: NextRequest) {
         fonts: [
           {
             name: "inter",
-            data: interFont,
+            data: interRegular,
             weight: 400,
+            style: "normal",
+          },
+          {
+            name: "inter",
+            data: interBold,
+            weight: 700,
             style: "normal",
           },
         ],
