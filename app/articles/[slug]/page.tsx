@@ -3,9 +3,19 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { getAllArticles, getArticleBySlug } from "../../lib/mdx";
 import { ArticleLayout } from "../../components/ArticleLayout";
+import { generateOGImageUrl } from "@/lib/utils";
 
-const getMetadata = cache(async (slug: string) => {
-  const { meta } = await getArticleBySlug(slug);
+export async function generateMetadata({
+  params,
+}: ArticlePageProps): Promise<Metadata> {
+  const { meta } = await getArticleBySlug(params.slug);
+
+  const ogImageUrl = generateOGImageUrl({
+    title: meta.title,
+    description: meta.description,
+    type: "article",
+    theme: (process.env.NEXT_PUBLIC_THEME as "light" | "dark") || "light",
+  });
 
   return {
     title: meta.title,
@@ -16,22 +26,23 @@ const getMetadata = cache(async (slug: string) => {
       type: "article",
       publishedTime: meta.date,
       authors: ["Hafizh Pratama"],
-      images: ["https://hafizh.pages.dev/thumbnail.png"],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: meta.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: meta.title,
       description: meta.description,
-      images: ["https://hafizh.pages.dev/thumbnail.png"],
+      images: [ogImageUrl],
     },
-    keywords: meta.keywords,
-    authors: [{ name: "Hafizh Pratama" }],
-    creator: "Hafizh Pratama",
-    alternates: {
-      canonical: `https://hafizh.pages.dev/articles/${slug}`,
-    },
-  } as Metadata;
-});
+  };
+}
 
 const getArticleData = cache(async (slug: string) => {
   try {
@@ -45,10 +56,6 @@ interface ArticlePageProps {
   params: {
     slug: string;
   };
-}
-
-export async function generateMetadata({ params }: ArticlePageProps) {
-  return getMetadata(params.slug);
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {

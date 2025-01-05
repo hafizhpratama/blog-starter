@@ -31,3 +31,9 @@ export interface Experience {
   technologies: string[];
   emoji: string;
 }
+
+export interface OGImageParams {
+  title?: string;
+  description?: string;
+  theme?: "light" | "dark";
+}
