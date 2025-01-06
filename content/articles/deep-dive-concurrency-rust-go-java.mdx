@@ -299,44 +299,60 @@ fn main() {
 }
 ```
 
-## 📊 Benchmark Results (5 iterations)
+## 📊 Benchmark Results
 
-```
-Language: Go
-Warm-up: 1666ms
-Iterations: 1902ms, 1919ms, 1984ms, 1997ms, 1899ms
-Average: 1940ms
+<table>
+  <thead>
+    <tr>
+      <th>Language</th>
+      <th>Warm-up Time</th>
+      <th>Iterations (ms)</th>
+      <th>Average Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Go</td>
+      <td>1835ms</td>
+      <td>1872, 2013, 1893, 1690, 1886</td>
+      <td>1870ms</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>2322ms</td>
+      <td>2611, 2128, 2101, 1914, 1753</td>
+      <td>2101ms</td>
+    </tr>
+    <tr>
+      <td>Rust</td>
+      <td>2459ms</td>
+      <td>2505, 2321, 2376, 2309, 2405</td>
+      <td>2383ms</td>
+    </tr>
+  </tbody>
+</table>
 
-Language: Java
-Warm-up: 1908ms
-Iterations: 1868ms, 1875ms, 1718ms, 1892ms, 1891ms
-Average: 1848ms
-
-Language: Rust
-Warm-up: 2368ms
-Iterations: 2342ms, 2394ms, 2360ms, 2312ms, 2341ms
-Average: 2349ms
-```
+_Note: All tests were run on Programiz online compiler (https://www.programiz.com/). Each implementation successfully found 664,579 prime numbers up to 10,000,000 across all iterations._
 
 ## 🎯 Key Insights untuk Software Engineers
 
 ### 1. Performance Analysis
 
-- **Java (1848ms)**:
+- **Go (1870ms)**:
 
   - Performa terbaik dalam test ini
-  - JIT optimization bekerja sangat efektif
-  - Thread pool management yang matang
-  - Konsistensi yang baik antar iterasi
-
-- **Go (1940ms)**:
-
-  - Performa kompetitif dengan Java
-  - Variasi performa yang wajar
+  - Konsistensi yang sangat baik antar iterasi
   - Overhead scheduling tetap minimal
   - Memory management yang efisien
 
-- **Rust (2349ms)**:
+- **Java (2101ms)**:
+
+  - Performa kompetitif setelah warm-up
+  - JIT optimization bekerja efektif
+  - Thread pool management yang matang
+  - Variance lebih tinggi antar iterasi
+
+- **Rust (2383ms)**:
   - Trade-off antara safety dan performance terlihat
   - Konsistensi performa yang sangat baik
   - Memory safety tanpa GC memiliki overhead
