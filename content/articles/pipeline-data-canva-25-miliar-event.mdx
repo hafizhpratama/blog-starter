@@ -6,7 +6,18 @@ readTime: "10 min read"
 category: "Technology"
 emoji: "📊"
 slug: "pipeline-data-canva-25-miliar-event"
-keywords: ["Canva", "Pipeline Data", "Big Data", "Kinesis Data Stream", "Protobuf", "Datumgen", "Scalability", "Reliability", "Cost Optimization"]
+keywords:
+  [
+    "Canva",
+    "Pipeline Data",
+    "Big Data",
+    "Kinesis Data Stream",
+    "Protobuf",
+    "Datumgen",
+    "Scalability",
+    "Reliability",
+    "Cost Optimization",
+  ]
 ---
 
 Di Canva, analytics bukan hanya alat pengukuran—ini adalah dasar dari pengambilan keputusan berbasis data. Dengan lebih dari **25 miliar event per hari** atau setara **800 miliar event per bulan**, arsitektur data pipeline Canva dirancang untuk **reliability**, **scalability**, dan **cost efficiency**. Artikel ini menjelaskan bagaimana tim engineering Canva membangun dan mengelola pipeline data yang mampu memenuhi kebutuhan skala besar dengan performa tinggi.
@@ -55,6 +66,7 @@ message PageVisitedEventProperties {
 ```
 
 **Keuntungan menggunakan Protobuf:**
+
 - **Backward & Forward Compatibility:** Mendukung perubahan schema tanpa mengganggu data yang sudah ada.
 - **Validation at Compile Time:** Meminimalkan error saat runtime dengan validasi sejak awal.
 
@@ -108,6 +120,7 @@ Selain itu, fallback ke **SQS** memastikan latensi tetap rendah dengan biaya tam
 Router mendistribusikan data ke konsumen seperti Snowflake, Elasticsearch, dan internal services lainnya. Konfigurasi ini sepenuhnya centralized, sehingga mudah menambahkan konsumen baru tanpa mengganggu konsumen yang sudah ada.
 
 **Keunggulan desain ini:**
+
 - **Modular & Scalable:** Routing logic dipisahkan dari worker utama.
 - **Dynamic Prioritization:** Konsumen dengan prioritas lebih tinggi dapat diproses terlebih dahulu.
 

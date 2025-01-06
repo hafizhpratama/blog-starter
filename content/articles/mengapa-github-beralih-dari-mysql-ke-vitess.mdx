@@ -6,7 +6,16 @@ readTime: "10 min read"
 category: "Technology"
 emoji: "🔗"
 slug: "mengapa-github-beralih-dari-mysql-ke-vitess"
-keywords: ["GitHub", "MySQL", "Vitess", "Skalabilitas", "Database", "Performa", "Horizontal Scaling"]
+keywords:
+  [
+    "GitHub",
+    "MySQL",
+    "Vitess",
+    "Skalabilitas",
+    "Database",
+    "Performa",
+    "Horizontal Scaling",
+  ]
 ---
 
 Platform pengembangan perangkat lunak terbesar di dunia, **GitHub**, terus mengalami pertumbuhan eksponensial dengan jutaan pengguna aktif dan miliaran transaksi setiap hari. Namun, dengan skala sebesar itu, MySQL yang selama ini menjadi andalan mereka mulai menunjukkan keterbatasannya dalam menangani lonjakan beban kerja. Untuk mengatasi masalah ini, GitHub memilih untuk bermigrasi ke **Vitess**, sebuah platform database modern yang mendukung skalabilitas horizontal dan performa tinggi.
@@ -20,15 +29,19 @@ Artikel ini membahas **alasan teknis**, **strategi migrasi**, dan **hasil transf
 Seiring bertambahnya pengguna, GitHub menghadapi berbagai kendala yang signifikan dengan MySQL:
 
 ### 1. Lonjakan Traffic yang Tak Terkendali
+
 GitHub menangani miliaran transaksi harian, termasuk **read-heavy operations** dan **write transactions**. Beban ini menyebabkan latensi meningkat, terutama pada jam-jam sibuk.
 
 ### 2. Replikasi Database yang Lambat
+
 Model replikasi MySQL berbasis **master-slave** tidak cukup efisien untuk menangani beban kerja besar, sering kali menyebabkan **replication lag** yang berdampak pada pengalaman pengguna.
 
 ### 3. Ketergantungan pada Vertical Scaling
+
 MySQL mengandalkan peningkatan kapasitas server tunggal (**vertical scaling**), yang tidak mampu mengimbangi kebutuhan GitHub untuk skalabilitas horizontal.
 
 ### 4. Downtime Selama Maintenance
+
 Proses seperti **schema migrations** memerlukan downtime, yang sulit diterima oleh platform global seperti GitHub dengan layanan 24/7.
 
 ---
@@ -38,21 +51,27 @@ Proses seperti **schema migrations** memerlukan downtime, yang sulit diterima ol
 Vitess adalah platform database middleware yang dirancang untuk membuat MySQL lebih skalabel dan efisien. Dibangun oleh tim YouTube dan diadopsi oleh banyak perusahaan besar, Vitess menawarkan fitur-fitur unggulan berikut:
 
 ### 1. Sharding Otomatis
+
 Vitess secara otomatis membagi database menjadi **shard** untuk mendistribusikan data dan beban kerja dengan lebih merata. Ini memungkinkan GitHub untuk memperluas kapasitas tanpa perubahan besar pada kode aplikasi.
 
 ### 2. Skalabilitas Horizontal
+
 Dengan kemampuan untuk menambahkan node baru ke cluster, Vitess memungkinkan pertumbuhan tanpa batas.
 
 ### 3. Query Routing yang Efisien
+
 Vitess menggunakan **smart query routing** untuk mengarahkan permintaan ke shard yang tepat, mengurangi latensi dan meningkatkan performa.
 
 ### 4. Replikasi Andal dengan Eventual Consistency
+
 Vitess menghilangkan masalah **replication lag**, memastikan data tetap konsisten meskipun dalam skala besar.
 
 ### 5. Zero Downtime Schema Migration
+
 Fitur ini memungkinkan perubahan skema dilakukan tanpa menghentikan operasi, menjadikannya sangat penting untuk layanan seperti GitHub.
 
 ### 6. Observability yang Kuat
+
 Vitess terintegrasi dengan alat seperti **Prometheus** dan **Grafana**, memberikan visibilitas penuh terhadap kinerja database.
 
 ---
@@ -62,15 +81,19 @@ Vitess terintegrasi dengan alat seperti **Prometheus** dan **Grafana**, memberik
 GitHub mengadopsi pendekatan bertahap untuk memastikan transisi berjalan mulus:
 
 ### 1. Proof of Concept (PoC)
+
 Tim GitHub pertama-tama melakukan uji coba Vitess dalam lingkungan kecil untuk memvalidasi kompatibilitas dan performa.
 
 ### 2. Dual-Write Setup
+
 Selama masa transisi, data ditulis ke MySQL dan Vitess secara bersamaan untuk memastikan integritas.
 
 ### 3. Incremental Migration
+
 Migrasi dilakukan secara bertahap, dimulai dari shard dengan risiko rendah, sehingga dampaknya dapat diminimalkan.
 
 ### 4. Monitoring dan Tuning
+
 GitHub memanfaatkan alat monitoring untuk mengidentifikasi dan memperbaiki potensi masalah sebelum implementasi penuh.
 
 ---
@@ -80,15 +103,19 @@ GitHub memanfaatkan alat monitoring untuk mengidentifikasi dan memperbaiki poten
 Setelah migrasi selesai, GitHub melaporkan sejumlah pencapaian penting:
 
 ### 1. Performa Lebih Cepat
+
 Latensi operasi database berkurang hingga **40%**, bahkan di bawah beban kerja berat.
 
 ### 2. Skalabilitas Tak Terbatas
+
 Dengan dukungan sharding, GitHub dapat menangani lonjakan traffic tanpa hambatan kapasitas.
 
 ### 3. Downtime Hampir Nol
+
 Proses pemeliharaan database tidak lagi mengganggu operasional berkat fitur **zero downtime migration**.
 
 ### 4. Efisiensi Biaya Infrastruktur
+
 Vitess memungkinkan penghematan biaya dengan memaksimalkan penggunaan sumber daya.
 
 ---

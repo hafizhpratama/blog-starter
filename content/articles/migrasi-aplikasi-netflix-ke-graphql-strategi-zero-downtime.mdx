@@ -6,7 +6,18 @@ readTime: "8 min read"
 category: "Technology"
 emoji: "🍿"
 slug: "migrasi-aplikasi-netflix-ke-graphql-strategi-zero-downtime"
-keywords: ["Netflix", "GraphQL", "Zero Downtime", "AB Testing", "Replay Testing", "Sticky Canary", "Skalabilitas", "Performance", "Zero Downtime Migration"]
+keywords:
+  [
+    "Netflix",
+    "GraphQL",
+    "Zero Downtime",
+    "AB Testing",
+    "Replay Testing",
+    "Sticky Canary",
+    "Skalabilitas",
+    "Performance",
+    "Zero Downtime Migration",
+  ]
 ---
 
 Pada tahun 2022, Netflix memulai langkah besar dengan migrasi aplikasi iOS dan Android mereka dari framework API internal ke **GraphQL**. Ini adalah proses yang menyentuh ratusan juta pengguna di seluruh dunia. Yang luar biasa, migrasi ini dilakukan dengan **zero downtime**.
@@ -60,6 +71,7 @@ Dengan AB Testing, Netflix dapat mengukur **metrik performa tingkat tinggi** den
 - **Experiment Group**: Menggunakan GraphQL Shim.
 
 #### Workflow:
+
 - Membagi 1 juta pengguna ke dalam dua kelompok.
 - Memantau metrik seperti **latensi**, **error rate**, dan **cache hit ratio**.
 - Mengidentifikasi peluang optimasi, misalnya dengan mengatur ulang cache TTL.
@@ -71,6 +83,7 @@ Dengan AB Testing, Netflix dapat mengukur **metrik performa tingkat tinggi** den
 Replay Testing menjadi kunci untuk memastikan **konsistensi data** antara Falcor dan GraphQL. Strategi ini sangat efektif untuk API yang **idempotent**.
 
 #### Workflow:
+
 1. Menggunakan direktif `@override` GraphQL untuk Federation.
 2. Menggunakan query yang sama terhadap Falcor dan Shim.
 3. Membandingkan hasil response untuk memastikan paritas.
@@ -78,6 +91,7 @@ Replay Testing menjadi kunci untuk memastikan **konsistensi data** antara Falcor
 **Pelajaran Penting**: Replay Testing membantu menemukan perbedaan lebih awal, memungkinkan engineer untuk menyelaraskan response.
 
 **Batasan**:
+
 - Kurang efektif untuk API non-idempotent.
 - Query manual bisa melewatkan edge cases.
 
@@ -86,6 +100,7 @@ Replay Testing menjadi kunci untuk memastikan **konsistensi data** antara Falcor
 Sticky Canary mensimulasikan kondisi real case untuk memvalidasi **business metrics** dan **scalability**.
 
 #### Workflow:
+
 - Mengarahkan sebagian trafik pengguna ke dua cluster:
   - Satu menggunakan GraphQL Shim.
   - Satu lagi menggunakan Falcor.
@@ -110,19 +125,27 @@ Sticky Canary mensimulasikan kondisi real case untuk memvalidasi **business metr
   </thead>
   <tbody>
     <tr>
-      <td><strong>AB Testing</strong></td>
+      <td>
+        <strong>AB Testing</strong>
+      </td>
       <td>Metrik performa tingkat tinggi</td>
-      <td>Memvalidasi user experience dalam skala besar; mendeteksi bug lebih awal</td>
+      <td>
+        Memvalidasi user experience dalam skala besar; mendeteksi bug lebih awal
+      </td>
       <td>Tidak menemukan akar masalah</td>
     </tr>
     <tr>
-      <td><strong>Replay Testing</strong></td>
+      <td>
+        <strong>Replay Testing</strong>
+      </td>
       <td>Konsistensi data</td>
       <td>Memastikan data tetap konsisten; ideal untuk API idempotent</td>
       <td>Terbatas untuk operasi idempotent</td>
     </tr>
     <tr>
-      <td><strong>Sticky Canary</strong></td>
+      <td>
+        <strong>Sticky Canary</strong>
+      </td>
       <td>Business metrics & scalability</td>
       <td>Ideal untuk skenario dunia nyata; mengungkap masalah scalability</td>
       <td>Risiko berdampak pada pengguna</td>
@@ -148,4 +171,3 @@ Migrasi Netflix menawarkan blueprint untuk menghadapi transisi skala besar:
 Migrasi ke GraphQL bukan hanya upgrade teknologi untuk Netflix; ini adalah redefinisi cara tim berkolaborasi dan membangun sistem yang tangguh. Dengan menggabungkan AB Testing, Replay Testing, dan Sticky Canary, Netflix berhasil melakukan migrasi dengan zero downtime.
 
 Bagi para software engineer yang menghadapi tantangan serupa, strategi ini memberikan peta jalan untuk meminimalkan risiko dan memaksimalkan keberhasilan.
-

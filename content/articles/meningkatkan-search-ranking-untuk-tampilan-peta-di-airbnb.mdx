@@ -1,0 +1,100 @@
+---
+title: "Meningkatkan Search Ranking untuk Tampilan Peta di Airbnb"
+description: "Pelajari bagaimana Airbnb mengoptimalkan algoritma ranking untuk tampilan peta, meningkatkan booking, dan memberikan pengalaman pengguna yang lebih baik."
+date: "February 2025"
+readTime: "7 min read"
+category: "Technology"
+emoji: "🗺️"
+slug: "meningkatkan-search-ranking-untuk-tampilan-peta-di-airbnb"
+keywords:
+  [
+    "Airbnb",
+    "Search Ranking",
+    "User Experience",
+    "Map Results",
+    "Algoritma",
+    "Optimization",
+    "A/B Testing",
+  ]
+---
+
+Airbnb baru-baru ini menghadapi tantangan menarik: bagaimana mengadaptasi algoritma ranking pencarian agar lebih sesuai untuk tampilan peta. Sebagai platform global, mereka membutuhkan solusi yang mengoptimalkan **user experience** (UX) untuk berbagai tampilan hasil pencarian.
+
+Artikel ini akan membahas pendekatan iteratif Airbnb, dari eksperimen awal hingga hasil akhir yang signifikan dalam meningkatkan **booking** dan pengalaman pengguna.
+
+---
+
+## Masalah Utama
+
+Airbnb awalnya menggunakan algoritma ranking yang sama untuk dua tampilan hasil pencarian:
+
+1. **List-results**: Tampilan berbentuk kartu dengan gambar, harga, rating, dan informasi lainnya.
+2. **Map-results**: Pin oval di peta yang menunjukkan lokasi dan harga listing.
+
+Namun, asumsi **user attention decay** (perhatian pengguna menurun secara linear dari atas ke bawah) yang digunakan pada tampilan list tidak relevan untuk tampilan peta. Pada peta, perhatian pengguna lebih tersebar dan tidak mengikuti pola tertentu.
+
+---
+
+## Solusi yang Diterapkan
+
+Untuk mengatasi masalah ini, tim engineering Airbnb mengembangkan beberapa pendekatan inovatif:
+
+### 1. Uniform User Attention
+
+Langkah pertama adalah mengasumsikan bahwa perhatian pengguna tersebar merata di seluruh pin peta. Untuk itu, mereka:
+
+- Menerapkan parameter yang membatasi rasio antara **booking probability** tertinggi dan terendah saat memilih pin yang ditampilkan.
+
+**Hasil:**
+
+- Salah satu peningkatan booking terbesar dalam sejarah Airbnb.
+- Peningkatan kualitas booking, terlihat dari kenaikan rating 5 bintang.
+
+### 2. Tiered User Attention
+
+Untuk tampilan desktop yang menampilkan hingga 18 hasil pencarian, Airbnb mengembangkan sistem **2-tier**:
+
+- **Regular pins**: Pin oval dengan harga untuk listing dengan **booking probability** tinggi.
+- **Mini-pins**: Pin lebih kecil tanpa harga untuk listing dengan **booking probability** lebih rendah.
+
+Pendekatan ini berhasil meningkatkan **Click-Through Rate (CTR)** hingga **8x lebih tinggi** untuk regular pins.
+
+### 3. Discounted User Attention
+
+Sebagai iterasi terakhir, tim menganalisis distribusi **click-through rate (CTR)** berdasarkan koordinat pin di peta. Data ini digunakan untuk:
+
+- Mengoptimalkan posisi center peta sehingga listing dengan **booking probability** tinggi lebih sering muncul di area yang sering di-click.
+
+**Hasil A/B testing:**
+
+- Peningkatan **uncancelled booking** sebesar 0.27%.
+- Pengurangan **map movement** sebesar 1.5%, menandakan UX yang lebih baik.
+
+---
+
+## Insight Teknis untuk Engineer
+
+Dari pengalaman Airbnb, kita dapat memetik beberapa pelajaran teknis:
+
+1. **Adaptasi Algoritma Sesuai UI**
+   Algoritma ranking harus disesuaikan dengan karakteristik tampilan UI. Tidak ada pendekatan "one size fits all".
+
+2. **Parameter Tuneable untuk Trade-off**
+   Menggunakan parameter yang dapat di-tuning membantu mengontrol keseimbangan antara **discovery** dan **conversion**.
+
+3. **Data Behavioral untuk Optimasi**
+   Pola perilaku pengguna, seperti **click patterns**, adalah kunci untuk meningkatkan UX dan hasil bisnis.
+
+---
+
+## Tantangan ke Depan
+
+Salah satu tantangan besar yang masih dihadapi Airbnb adalah bagaimana menampilkan **full range listing** di peta tanpa mengorbankan UX. Ini menjadi area riset menarik yang berpotensi membuka peluang inovasi lebih lanjut.
+
+---
+
+Pengalaman Airbnb menunjukkan bahwa pendekatan iteratif dan **data-driven** dapat menghasilkan dampak besar pada performa sistem dan UX. Bagi software engineer di Indonesia, ini bisa menjadi inspirasi untuk mengoptimalkan sistem ranking di produk lokal, terutama dengan berbagai tampilan hasil pencarian yang memiliki pola interaksi pengguna berbeda.
+
+---
+
+**Sumber:** [Medium - Improving Search Ranking for Maps](https://medium.com/airbnb-engineering/improving-search-ranking-for-maps-13b03f2c2cca)

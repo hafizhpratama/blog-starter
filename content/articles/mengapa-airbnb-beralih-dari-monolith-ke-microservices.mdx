@@ -1,34 +1,46 @@
 ---
 title: "Mengapa Airbnb Beralih dari Monolith ke Microservices?"
 description: "Pelajari alasan teknis dan hasil transformasi arsitektur Airbnb dari monolith ke microservices."
-date: 'January 2025'
-readTime: '10 min read'
-category: 'Technology'
+date: "January 2025"
+readTime: "10 min read"
+category: "Technology"
 emoji: "🏨"
 slug: "airbnb-beralih-ke-microservices"
-keywords: ["Airbnb", "Monolith", "Microservices", "Skalabilitas", "Fleksibilitas", "Transformasi Arsitektur"]
+keywords:
+  [
+    "Airbnb",
+    "Monolith",
+    "Microservices",
+    "Skalabilitas",
+    "Fleksibilitas",
+    "Transformasi Arsitektur",
+  ]
 ---
 
 Ketika berbicara tentang **transformasi arsitektur**, langkah strategis Airbnb dari **monolith** ke **microservices** menjadi contoh sempurna bagaimana perusahaan besar meningkatkan skalabilitas dan fleksibilitas sistem mereka. Dalam artikel ini, kami akan membahas:
 
-- Tantangan dengan arsitektur monolith.  
-- Alasan teknis di balik keputusan Airbnb.  
-- Strategi migrasi yang mereka gunakan.  
-- Hasil transformasi yang diraih.  
+- Tantangan dengan arsitektur monolith.
+- Alasan teknis di balik keputusan Airbnb.
+- Strategi migrasi yang mereka gunakan.
+- Hasil transformasi yang diraih.
 
 ---
 
 ## Tantangan Arsitektur Monolith
 
 ### 1. **Codebase yang Sulit Dikelola**
+
 Monolith menggabungkan seluruh aplikasi dalam satu unit besar, yang menghadirkan berbagai kendala:
+
 - **Waktu build/deploy lama**: Setiap perubahan memerlukan pengujian ulang seluruh sistem.
 - **Dependency conflicts**: Perubahan kecil dapat berdampak besar pada bagian lain.
 
 ### 2. **Skalabilitas Terbatas**
+
 Sulit untuk meningkatkan kapasitas layanan tertentu tanpa menduplikasi seluruh sistem, membuat monolith tidak efisien.
 
 ### 3. **Risiko Downtime Tinggi**
+
 Kegagalan pada satu bagian dapat menyebabkan **downtime** pada seluruh aplikasi.
 
 ---
@@ -38,12 +50,15 @@ Kegagalan pada satu bagian dapat menyebabkan **downtime** pada seluruh aplikasi.
 Airbnb memilih **microservices** karena berbagai keunggulan berikut:
 
 ### 1. **Desentralisasi dan Independensi**
+
 Tim dapat bekerja pada layanan masing-masing tanpa ketergantungan besar.
 
 ### 2. **Skalabilitas Modular**
+
 Setiap layanan dapat diskalakan secara independen sesuai kebutuhan.
 
 ### 3. **Resilience yang Tinggi**
+
 Kegagalan satu layanan tidak akan memengaruhi layanan lain.
 
 ---
@@ -51,12 +66,15 @@ Kegagalan satu layanan tidak akan memengaruhi layanan lain.
 ## Strategi Migrasi Airbnb ke Microservices
 
 ### 1. **Identifikasi Domain Bisnis**
+
 Airbnb memetakan domain seperti pemesanan, pembayaran, dan rekomendasi untuk dipisahkan menjadi microservices.
 
 ### 2. **Penerapan API Gateway**
+
 **API Gateway** bertindak sebagai penghubung antar layanan, memastikan komunikasi berjalan lancar.
 
 ### 3. **Pendekatan Bertahap**
+
 Mereka memulai migrasi dari layanan kecil hingga akhirnya menyentuh inti seperti pembayaran.
 
 ---
@@ -64,27 +82,33 @@ Mereka memulai migrasi dari layanan kecil hingga akhirnya menyentuh inti seperti
 ## Hasil Transformasi Arsitektur Airbnb
 
 ### 1. **Peningkatan Inovasi**
+
 Proses pengembangan fitur baru menjadi lebih cepat.
 
 ### 2. **Skalabilitas Optimal**
+
 Airbnb dapat menangani lonjakan traffic lebih efisien, terutama pada musim sibuk.
 
 ### 3. **Reliability yang Lebih Baik**
+
 Downtime berkurang drastis karena isolasi layanan.
 
 ---
 
 ## Pelajaran dari Migrasi Airbnb
 
-### 1. Mulailah dengan Memetakan Domain  
-Pemisahan layanan harus berdasarkan logika bisnis yang jelas.  
+### 1. Mulailah dengan Memetakan Domain
 
-### 2. Gunakan Pendekatan Bertahap  
+Pemisahan layanan harus berdasarkan logika bisnis yang jelas.
+
+### 2. Gunakan Pendekatan Bertahap
+
 Migrasi bertahap membantu meminimalkan risiko.
 
-### 3. Prioritaskan Monitoring  
+### 3. Prioritaskan Monitoring
+
 Investasi pada tools observasi seperti **Datadog** atau **Jaeger** sangat penting untuk menjaga performa.
 
 ---
 
-Dengan transformasi ini, Airbnb tidak hanya meningkatkan keandalan sistem tetapi juga mempercepat inovasi mereka. **Apakah Anda siap untuk mengadopsi microservices?** 
+Dengan transformasi ini, Airbnb tidak hanya meningkatkan keandalan sistem tetapi juga mempercepat inovasi mereka.

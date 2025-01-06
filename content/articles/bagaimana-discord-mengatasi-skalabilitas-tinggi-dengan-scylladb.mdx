@@ -1,112 +1,142 @@
 ---
 title: "Bagaimana Discord Mengatasi Skalabilitas Tinggi dengan ScyllaDB"
 description: "Pelajari bagaimana Discord meningkatkan performa, mengurangi biaya, dan mengatasi kendala skalabilitas tinggi dengan beralih ke ScyllaDB."
-date: 'January 2025'
-readTime: '8 min read'
-category: 'Technology'
+date: "January 2025"
+readTime: "8 min read"
+category: "Technology"
 emoji: "🪼"
 slug: "bagaimana-discord-mengatasi-skalabilitas-tinggi-dengan-scylladb"
-keywords: ["Discord", "ScyllaDB", "Cassandra", "Skalabilitas", "Database NoSQL", "Latency", "Optimasi Performa"]
+keywords:
+  [
+    "Discord",
+    "ScyllaDB",
+    "Cassandra",
+    "Skalabilitas",
+    "Database NoSQL",
+    "Latency",
+    "Optimasi Performa",
+  ]
 ---
 
-Mengelola **scalability** untuk platform dengan jutaan pengguna aktif secara bersamaan adalah tantangan besar. **Discord**, platform komunikasi real-time yang populer, menghadapi kendala besar terkait **latency**, **throughput**, dan **reliability**.  
+Mengelola **scalability** untuk platform dengan jutaan pengguna aktif secara bersamaan adalah tantangan besar. **Discord**, platform komunikasi real-time yang populer, menghadapi kendala besar terkait **latency**, **throughput**, dan **reliability**.
 
 Setelah bertahun-tahun menggunakan **Apache Cassandra** sebagai database utama, Discord memutuskan untuk beralih ke **ScyllaDB** demi mengatasi keterbatasan performa seiring pertumbuhan platform. Artikel ini membahas alasan teknis di balik keputusan Discord dan hasil yang mereka capai.
 
 ---
 
-## Masalah Utama yang Dihadapi Discord  
+## Masalah Utama yang Dihadapi Discord
 
 Sebelum migrasi ke ScyllaDB, Discord menghadapi tiga tantangan besar:
 
-### 1. Lonjakan Traffic yang Tidak Terduga  
-Discord memproses miliaran **read** dan **write requests** setiap hari. Lonjakan traffic akibat peluncuran game populer atau event besar sering kali menyebabkan:  
+### 1. Lonjakan Traffic yang Tidak Terduga
 
-- **GC pauses (Garbage Collection)**  
-- Penurunan performa selama periode penting.  
+Discord memproses miliaran **read** dan **write requests** setiap hari. Lonjakan traffic akibat peluncuran game populer atau event besar sering kali menyebabkan:
 
-### 2. Latency yang Tidak Stabil  
-Dengan Cassandra, Discord sering mengalami **p95** dan **p99 latency** yang tinggi karena:  
-- **Compaction overhead**.  
-- Ketidakseimbangan beban pada node.  
+- **GC pauses (Garbage Collection)**
+- Penurunan performa selama periode penting.
+
+### 2. Latency yang Tidak Stabil
+
+Dengan Cassandra, Discord sering mengalami **p95** dan **p99 latency** yang tinggi karena:
+
+- **Compaction overhead**.
+- Ketidakseimbangan beban pada node.
 
 Ini berdampak langsung pada pengalaman pengguna yang membutuhkan komunikasi real-time tanpa hambatan.
 
-### 3. Biaya Infrastruktur yang Tinggi  
-Cassandra memerlukan jumlah node yang sangat besar untuk menangani workload berat. Hal ini menyebabkan:  
-- Peningkatan biaya infrastruktur.  
-- Beban operasional yang tinggi untuk pemeliharaan.  
+### 3. Biaya Infrastruktur yang Tinggi
+
+Cassandra memerlukan jumlah node yang sangat besar untuk menangani workload berat. Hal ini menyebabkan:
+
+- Peningkatan biaya infrastruktur.
+- Beban operasional yang tinggi untuk pemeliharaan.
 
 ---
 
-## Mengapa Discord Memilih ScyllaDB?  
+## Mengapa Discord Memilih ScyllaDB?
 
-Discord memilih ScyllaDB karena menawarkan solusi teknis yang lebih unggul untuk kebutuhan mereka. Berikut adalah alasan utama:  
+Discord memilih ScyllaDB karena menawarkan solusi teknis yang lebih unggul untuk kebutuhan mereka. Berikut adalah alasan utama:
 
-### 1. **Optimasi Multi-Core CPU Modern**  
-ScyllaDB menggunakan **Seastar framework** dengan arsitektur **shared-nothing**, yang memungkinkan penggunaan **multi-core CPU** secara maksimal.  
+### 1. **Optimasi Multi-Core CPU Modern**
 
-### 2. **Low Latency yang Stabil**  
+ScyllaDB menggunakan **Seastar framework** dengan arsitektur **shared-nothing**, yang memungkinkan penggunaan **multi-core CPU** secara maksimal.
+
+### 2. **Low Latency yang Stabil**
+
 Teknologi **direct I/O** dan algoritma **compaction** yang efisien membuat ScyllaDB mampu menjaga latency tetap rendah bahkan di bawah beban berat.
 
-### 3. **Kompatibilitas Cassandra**  
+### 3. **Kompatibilitas Cassandra**
+
 ScyllaDB sepenuhnya mendukung **Cassandra Query Language (CQL)**, mempermudah migrasi tanpa memerlukan perubahan besar pada ekosistem aplikasi.
 
-### 4. **Efisiensi Sumber Daya**  
-Dengan desain yang efisien, Discord berhasil:  
-- Mengurangi jumlah server hingga 30%.  
+### 4. **Efisiensi Sumber Daya**
+
+Dengan desain yang efisien, Discord berhasil:
+
+- Mengurangi jumlah server hingga 30%.
 - Menekan biaya infrastruktur tanpa mengorbankan performa.
 
 ---
 
-## Strategi Migrasi Discord ke ScyllaDB  
+## Strategi Migrasi Discord ke ScyllaDB
 
 Discord menerapkan pendekatan yang terencana dan bertahap untuk meminimalkan risiko:
 
-### 1. **Proof of Concept (PoC)**  
-Menguji performa ScyllaDB di lingkungan **sandbox** untuk memastikan:  
-- Kompatibilitas dengan sistem yang ada.  
+### 1. **Proof of Concept (PoC)**
+
+Menguji performa ScyllaDB di lingkungan **sandbox** untuk memastikan:
+
+- Kompatibilitas dengan sistem yang ada.
 - Latency dan throughput sesuai ekspektasi.
 
-### 2. **Dual-Write**  
+### 2. **Dual-Write**
+
 Mengadopsi pendekatan **dual-write** selama masa transisi, dengan menulis data ke Cassandra dan ScyllaDB secara bersamaan untuk menjaga integritas data.
 
-### 3. **Monitoring dan Optimasi**  
-Memanfaatkan **Scylla Monitoring Stack** (berbasis Prometheus dan Grafana) untuk memantau metrik penting, seperti:  
-- **CPU utilization**.  
-- **Disk I/O**.  
+### 3. **Monitoring dan Optimasi**
+
+Memanfaatkan **Scylla Monitoring Stack** (berbasis Prometheus dan Grafana) untuk memantau metrik penting, seperti:
+
+- **CPU utilization**.
+- **Disk I/O**.
 - **Cache efficiency**.
 
 ---
 
-## Hasil Migrasi ke ScyllaDB  
+## Hasil Migrasi ke ScyllaDB
 
-Setelah implementasi ScyllaDB, Discord memperoleh hasil yang signifikan:  
+Setelah implementasi ScyllaDB, Discord memperoleh hasil yang signifikan:
 
-### 1. **Latency Lebih Stabil**  
-Latency untuk operasi **write** berkurang hingga 50%, dengan stabilitas lebih baik pada **p95** dan **p99 latency**.  
+### 1. **Latency Lebih Stabil**
 
-### 2. **Throughput Meningkat**  
-ScyllaDB mampu menangani throughput yang lebih tinggi, sehingga Discord bisa mengatasi lonjakan traffic dengan mudah.  
+Latency untuk operasi **write** berkurang hingga 50%, dengan stabilitas lebih baik pada **p95** dan **p99 latency**.
 
-### 3. **Penghematan Infrastruktur**  
+### 2. **Throughput Meningkat**
+
+ScyllaDB mampu menangani throughput yang lebih tinggi, sehingga Discord bisa mengatasi lonjakan traffic dengan mudah.
+
+### 3. **Penghematan Infrastruktur**
+
 Dengan jumlah node yang berkurang hingga 30%, Discord mengurangi biaya infrastruktur sambil meningkatkan efisiensi operasional.
 
 ---
 
-## Pelajaran yang Bisa Diambil  
+## Pelajaran yang Bisa Diambil
 
-Pengalaman Discord memberikan beberapa pelajaran berharga:  
+Pengalaman Discord memberikan beberapa pelajaran berharga:
 
-### 1. **Pahami Pola Workload Anda**  
+### 1. **Pahami Pola Workload Anda**
+
 Memilih database yang tepat memerlukan pemahaman mendalam tentang workload dan kebutuhan spesifik aplikasi.
 
-### 2. **Efisiensi adalah Kunci**  
+### 2. **Efisiensi adalah Kunci**
+
 Database modern seperti ScyllaDB memungkinkan pengelolaan sumber daya yang lebih baik, memberikan performa tinggi dengan biaya lebih rendah.
 
-### 3. **Rencanakan Migrasi dengan Hati-Hati**  
-Pendekatan seperti **dual-write** dan monitoring menyeluruh penting untuk memastikan transisi yang mulus.  
+### 3. **Rencanakan Migrasi dengan Hati-Hati**
+
+Pendekatan seperti **dual-write** dan monitoring menyeluruh penting untuk memastikan transisi yang mulus.
 
 ---
 
-**Ingin tahu lebih banyak tentang ScyllaDB?** Jangan ragu untuk mengeksplorasi dokumentasi resminya di [ScyllaDB Documentation](https://www.scylladb.com/).  
+**Ingin tahu lebih banyak tentang ScyllaDB?** Jangan ragu untuk mengeksplorasi dokumentasi resminya di [ScyllaDB Documentation](https://www.scylladb.com/).
