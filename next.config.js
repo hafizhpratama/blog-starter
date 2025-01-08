@@ -6,35 +6,39 @@ const nextConfig = {
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96],
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
+  },
+
+  compiler: {
+    styledComponents: true,
   },
 
   async headers() {
     return [
       {
-        source: '/:all*(svg|jpg|png)',
+        source: "/:all*(svg|jpg|png)",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
-          }
-        ]
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
       },
       {
-        source: '/fonts/:path*',
+        source: "/fonts/:path*",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
-          }
-        ]
-      }
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ];
   },
 
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ["lucide-react"],
     scrollRestoration: true,
   },
 
@@ -43,9 +47,9 @@ const nextConfig = {
       config.optimization.splitChunks.cacheGroups = {
         ...config.optimization.splitChunks.cacheGroups,
         styles: {
-          name: 'styles',
+          name: "styles",
           test: /\.(css|scss)$/,
-          chunks: 'all',
+          chunks: "all",
           enforce: true,
         },
       };
