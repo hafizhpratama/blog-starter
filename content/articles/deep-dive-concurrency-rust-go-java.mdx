@@ -1,421 +1,245 @@
 ---
 title: "Deep Dive: Implementasi Concurrency di Rust, Go, dan Java - Apa yang Engineer Perlu Tahu?"
-description: "Analisis mendalam perbandingan pattern concurrency di Rust, Go, dan Java melalui studi kasus perhitungan bilangan prima paralel, dengan insights praktis untuk software engineers."
+description: "Analisis mendalam tentang concurrency di Rust, Go, dan Java melalui benchmark, studi kasus, dan tips praktis untuk engineer."
 date: "February 2025"
-readTime: "15 min read"
+readTime: "8 min"
 category: "Technology"
-emoji: "🔥"
-slug: "deep-dive-concurrency-rust-go-java"
+emoji: "🚀"
+slug: "implementasi-concurrency-rust-go-java"
 keywords:
   [
-    "Concurrent Programming",
-    "Rust Threading",
-    "Go Goroutines",
-    "Java ExecutorService",
-    "Performance Analysis",
-    "Parallel Computing",
+    "Rust",
+    "Go",
+    "Java",
+    "Concurrency",
+    "Programming",
+    "Benchmark",
+    "Parallel Processing",
     "Software Engineering",
-    "Technical Deep Dive",
   ]
 ---
 
-Sebagai software engineer, kita sering dihadapkan dengan pilihan teknologi untuk menangani komputasi paralel. Bagaimana kita memilih antara **Rust** dengan zero-cost abstractions-nya, **Go** dengan goroutines yang ringan, atau **Java** dengan eksosistem mature-nya?
+**Analisis mendalam pattern concurrency di Rust, Go, dan Java melalui studi kasus komputasi paralel.** Temukan perbandingan performa, efisiensi memori, dan best practices untuk software engineering.
 
-Artikel ini akan membedah implementasi concurrency di ketiga bahasa tersebut melalui studi kasus real: **parallel prime number calculation**. Kita akan melihat tidak hanya performa, tapi juga pattern, idiom, dan best practices di masing-masing bahasa.
+---
 
-## 🎯 The Challenge: Parallel Prime Calculation
+## **Apa yang Akan Anda Pelajari?**
 
-Kita akan menghitung bilangan prima hingga 10 juta menggunakan 8 thread parallel. Problem ini dipilih karena:
+- Perbandingan **benchmark terbaru**(Desember 2024) antara Rust, Go, dan Java.
+- **Keunggulan dan kelemahan**masing-masing bahasa dalam concurrent programming.
+- Studi kasus nyata untuk membantu Anda memilih teknologi yang tepat.
+- **Tips praktis**untuk mengoptimalkan performa di proyek Anda.
 
-- CPU-bound task yang ideal untuk parallel processing
-- Mudah dibagi menjadi independent chunks (embarrassingly parallel)
-- Membutuhkan koordinasi untuk result aggregation
-- Hasil yang deterministik untuk verifikasi
-- Ideal untuk benchmarking yang fair
+---
 
-## 💡 Deep Dive: Pattern dan Implementasi
+## **Benchmark Terbaru: Performa Rust vs Go vs Java**
 
-### 1. Go Implementation: Goroutines & Channels
+Benchmark berikut menguji tiga aspek utama dalam concurrent programming: _execution time_, _memory usage_, dan _parallel efficiency_. Data diambil dari [Programming Language Benchmarks](https://programming-language-benchmarks.vercel.app/).
 
-```go
-package main
+### **1. Binary Trees Performance**
 
-import (
-    "fmt"
-    "sync"
-    "time"
-)
-
-func isPrime(n uint64) bool {
-    if n <= 1 { return false }
-    if n <= 3 { return true }
-    if n%2 == 0 || n%3 == 0 { return false }
-    for i := uint64(5); i*i <= n; i += 6 {
-        if n%i == 0 || n%(i+2) == 0 {
-            return false
-        }
-    }
-    return true
-}
-
-func countPrimes(iterations int) {
-    target := uint64(10_000_000)  // 10 million
-    threads := 8
-    chunkSize := target / uint64(threads)
-
-    var totalDuration int64
-
-    for iter := 0; iter < iterations; iter++ {
-        start := time.Now()
-        var wg sync.WaitGroup
-        countChan := make(chan int, threads)
-
-        // Spawn goroutines for each chunk
-        for i := 0; i < threads; i++ {
-            wg.Add(1)
-            go func(start, end uint64) {
-                defer wg.Done()
-                count := 0
-                for n := start; n <= end; n++ {
-                    if isPrime(n) {
-                        count++
-                    }
-                }
-                countChan <- count
-            }(uint64(i)*chunkSize+1, uint64(i+1)*chunkSize)
-        }
-
-        // Close channel after all goroutines complete
-        go func() {
-            wg.Wait()
-            close(countChan)
-        }()
-
-        // Collect results
-        totalPrimes := 0
-        for count := range countChan {
-            totalPrimes += count
-        }
-
-        duration := time.Since(start).Milliseconds()
-        totalDuration += duration
-
-        fmt.Printf("Iteration %d: Found %d primes up to %d in %dms\n",
-                  iter+1, totalPrimes, target, duration)
-    }
-
-    fmt.Printf("\nLanguage: Go\n")
-    fmt.Printf("Average time over %d iterations: %dms\n",
-              iterations, totalDuration/int64(iterations))
-}
-
-func main() {
-    // Warm-up run
-    countPrimes(1)
-    fmt.Printf("\nWarm-up complete. Starting benchmark...\n\n")
-    // Actual benchmark
-    countPrimes(5)
-}
-```
-
-**🔍 Key Design Patterns:**
-
-- Menggunakan `sync.WaitGroup` untuk sinkronisasi
-- Buffered channel untuk result collection
-- Goroutines yang ringan (bisa spawn ribuan)
-- Multiple iterations untuk accurate benchmarking
-
-**💪 Strengths:**
-
-- Syntax yang clean dan intuitive
-- Lightweight concurrency
-- Built-in synchronization primitives
-- Performa paling konsisten di antara ketiga bahasa
-
-### 2. Java Implementation: ExecutorService & Futures
-
-```java
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-
-public class Main {
-    private static boolean isPrime(long n) {
-        if (n <= 1) return false;
-        if (n <= 3) return true;
-        if (n % 2 == 0 || n % 3 == 0) return false;
-        for (long i = 5; i * i <= n; i += 6) {
-            if (n % i == 0 || n % (i + 2) == 0) return false;
-        }
-        return true;
-    }
-
-    static class PrimeCounter implements Callable<Integer> {
-        private final long start;
-        private final long end;
-
-        PrimeCounter(long start, long end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        public Integer call() {
-            int count = 0;
-            for (long n = start; n <= end; n++) {
-                if (isPrime(n)) count++;
-            }
-            return count;
-        }
-    }
-
-    private static void countPrimes(int iterations) throws InterruptedException, ExecutionException {
-        long target = 10_000_000;  // 10 million
-        int threads = 8;
-        long chunkSize = target / threads;
-        long totalDuration = 0;
-
-        for (int iter = 0; iter < iterations; iter++) {
-            // Create thread pool
-            ExecutorService executor = Executors.newFixedThreadPool(threads);
-            List<Future<Integer>> futures = new ArrayList<>();
-
-            long startTime = System.currentTimeMillis();
-
-            // Submit tasks
-            for (int i = 0; i < threads; i++) {
-                long start = i * chunkSize + 1;
-                long end = (i == threads - 1) ? target : (i + 1) * chunkSize;
-                futures.add(executor.submit(new PrimeCounter(start, end)));
-            }
-
-            // Collect results
-            int totalPrimes = 0;
-            for (Future<Integer> future : futures) {
-                totalPrimes += future.get();
-            }
-
-            long duration = System.currentTimeMillis() - startTime;
-            totalDuration += duration;
-
-            System.out.printf("Iteration %d: Found %d primes up to %d in %dms%n",
-                            iter + 1, totalPrimes, target, duration);
-
-            executor.shutdown();
-            executor.awaitTermination(10, TimeUnit.SECONDS);
-        }
-
-        System.out.println("\nLanguage: Java");
-        System.out.printf("Average time over %d iterations: %dms%n",
-                         iterations, totalDuration / iterations);
-    }
-
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
-        // Warm-up run
-        countPrimes(1);
-        System.out.println("\nWarm-up complete. Starting benchmark...\n");
-        // Actual benchmark
-        countPrimes(5);
-    }
-}
-```
-
-**🔍 Key Design Patterns:**
-
-- Thread pool management dengan ExecutorService
-- Task definition menggunakan Callable
-- Future untuk async result handling
-- Proper resource cleanup dengan shutdown
-
-### 3. Rust Implementation: Native Threads & Ownership
-
-```rust
-use std::time::Instant;
-use std::thread;
-
-fn is_prime(n: u64) -> bool {
-    if n <= 1 { return false; }
-    if n <= 3 { return true; }
-    if n % 2 == 0 || n % 3 == 0 { return false; }
-    let mut i = 5;
-    while i * i <= n {
-        if n % i == 0 || n % (i + 2) == 0 { return false; }
-        i += 6;
-    }
-    true
-}
-
-fn count_primes(iterations: u32) {
-    let target = 10_000_000;  // 10 million
-    let threads = 8;
-    let chunk_size = target / threads as u64;
-
-    let mut total_duration = 0;
-
-    for iter in 0..iterations {
-        let start = Instant::now();
-        let mut handles = vec![];
-
-        // Spawn threads
-        for i in 0..threads {
-            let start_num = i as u64 * chunk_size + 1;
-            let end_num = if i == threads - 1 {
-                target
-            } else {
-                (i as u64 + 1) * chunk_size
-            };
-
-            handles.push(thread::spawn(move || {
-                (start_num..=end_num)
-                    .filter(|&n| is_prime(n))
-                    .count()
-            }));
-        }
-
-        // Collect results
-        let mut prime_count = 0;
-        for handle in handles {
-            prime_count += handle.join().unwrap();
-        }
-
-        let duration = start.elapsed().as_millis();
-        total_duration += duration;
-
-        println!("Iteration {}: Found {} primes up to {} in {}ms",
-                iter + 1, prime_count, target, duration);
-    }
-
-    println!("\nLanguage: Rust");
-    println!("Average time over {} iterations: {}ms",
-             iterations, total_duration / iterations as u128);
-}
-
-fn main() {
-    // Warm-up run
-    count_primes(1);
-    println!("\nWarm-up complete. Starting benchmark...\n");
-    // Actual benchmark
-    count_primes(5);
-}
-```
-
-## 📊 Benchmark Results
+Benchmark ini mengukur efisiensi _memory management_ dan _garbage collection_.
 
 <table>
   <thead>
     <tr>
-      <th>Language</th>
-      <th>Warm-up Time</th>
-      <th>Iterations (ms)</th>
-      <th>Average Time</th>
+      <th>Bahasa</th>
+      <th>Execution Time (ms)</th>
+      <th>Peak Memory Usage</th>
+      <th>Runtime/Compiler</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Go</td>
-      <td>1835ms</td>
-      <td>1872, 2013, 1893, 1690, 1886</td>
-      <td>1870ms</td>
-    </tr>
-    <tr>
       <td>Java</td>
-      <td>2322ms</td>
-      <td>2611, 2128, 2101, 1914, 1753</td>
-      <td>2101ms</td>
+      <td>
+        <strong>428</strong>
+      </td>
+      <td>574.2 MB</td>
+      <td>OpenJDK 21</td>
     </tr>
     <tr>
       <td>Rust</td>
-      <td>2459ms</td>
-      <td>2505, 2321, 2376, 2309, 2405</td>
-      <td>2383ms</td>
+      <td>1,176</td>
+      <td>
+        <strong>33.8 MB</strong>
+      </td>
+      <td>Rustc 1.83.0</td>
+    </tr>
+    <tr>
+      <td>Go</td>
+      <td>2,534</td>
+      <td>41.9 MB</td>
+      <td>Go 1.23.4</td>
     </tr>
   </tbody>
 </table>
 
-_Note: All tests were run on Programiz online compiler (https://www.programiz.com/). Each implementation successfully found 664,579 prime numbers up to 10,000,000 across all iterations._
+**Insight Utama:**
 
-## 🎯 Key Insights untuk Software Engineers
+- Java unggul dalam kecepatan eksekusi.
+- Rust jauh lebih efisien dalam penggunaan memori (hanya **5.8%** dari Java).
 
-### 1. Performance Analysis
+---
 
-- **Go (1870ms)**:
+### **2. N-Body Simulation**
 
-  - Performa terbaik dalam test ini
-  - Konsistensi yang sangat baik antar iterasi
-  - Overhead scheduling tetap minimal
-  - Memory management yang efisien
+Benchmark ini mengukur performa _floating-point arithmetic_ dan optimisasi SIMD.
 
-- **Java (2101ms)**:
+<table>
+  <thead>
+    <tr>
+      <th>Bahasa</th>
+      <th>Execution Time (ms)</th>
+      <th>Peak Memory Usage</th>
+      <th>Implementation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Rust</td>
+      <td>
+        <strong>160</strong>
+      </td>
+      <td>
+        <strong>1.8 MB</strong>
+      </td>
+      <td>SIMD Optimization</td>
+    </tr>
+    <tr>
+      <td>Go</td>
+      <td>331</td>
+      <td>0.1 MB</td>
+      <td>TinyGo</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>417</td>
+      <td>45.2 MB</td>
+      <td>OpenJDK 21</td>
+    </tr>
+  </tbody>
+</table>
 
-  - Performa kompetitif setelah warm-up
-  - JIT optimization bekerja efektif
-  - Thread pool management yang matang
-  - Variance lebih tinggi antar iterasi
+**Insight Utama:**
 
-- **Rust (2383ms)**:
-  - Trade-off antara safety dan performance terlihat
-  - Konsistensi performa yang sangat baik
-  - Memory safety tanpa GC memiliki overhead
-  - Hasil masih kompetitif untuk use-case ini
+- Rust menunjukkan performa luar biasa dengan optimisasi SIMD.
+- Go lebih efisien dalam penggunaan memori, cocok untuk perangkat terbatas.
 
-### 2. Implementation Complexity
+---
 
-1. **Go**:
+### **3. Parallel Processing (Spectral Norm)**
 
-   - Paling straightforward untuk diimplementasi
-   - Pattern yang clean dan mudah dipahami
-   - Error handling bisa tricky untuk concurrent code
+Benchmark ini mengukur kemampuan _parallelization_ masing-masing bahasa.
 
-2. **Java**:
+<table>
+  <thead>
+    <tr>
+      <th>Bahasa</th>
+      <th>Execution Time (ms)</th>
+      <th>Peak Memory Usage</th>
+      <th>Parallel Threads</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Rust</td>
+      <td>
+        <strong>469</strong>
+      </td>
+      <td>
+        <strong>4.6 MB</strong>
+      </td>
+      <td>8 Threads</td>
+    </tr>
+    <tr>
+      <td>Go</td>
+      <td>1,818</td>
+      <td>5.4 MB</td>
+      <td>Goroutines</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>1,867</td>
+      <td>47.6 MB</td>
+      <td>ExecutorService</td>
+    </tr>
+  </tbody>
+</table>
 
-   - Boilerplate lebih banyak tapi structured
-   - Exception handling lebih robust
-   - Thread management lebih explicit
+**Insight Utama:**
 
-3. **Rust**:
-   - Learning curve paling tinggi
-   - Ownership system memerlukan pemahaman mendalam
-   - Safety guarantees di compile time
+- Rust menunjukkan efisiensi tinggi dalam _parallel execution_ dan penggunaan memori.
+- Go dan Java memiliki performa serupa, dengan Java memakan lebih banyak memori.
 
-## 🎯 Rekomendasi Praktis
+---
 
-1. **Untuk Microservices & Cloud Applications:**
+## Trade-offs Consideration
 
-   - Go adalah pilihan optimal
-   - Performa konsisten dan resource usage efisien
-   - Cocok untuk scalable services
+1. **Development Speed**:
 
-2. **Untuk Enterprise Applications:**
+   - Go ⭐⭐⭐⭐⭐
+   - Java ⭐⭐⭐⭐
+   - Rust ⭐⭐⭐
 
-   - Java masih sangat relevan
-   - Ecosystem mature dengan tooling lengkap
-   - Performance gap dengan Go minimal
+2. **Performance**:
 
-3. **Untuk Systems Programming:**
-   - Rust tetap pilihan solid
-   - Memory safety tanpa GC
-   - Ideal untuk performance-critical systems
+   - Rust ⭐⭐⭐⭐⭐
+   - Java ⭐⭐⭐⭐
+   - Go ⭐⭐⭐⭐
 
-## 📚 Resources untuk Further Learning
+3. **Memory Efficiency**:
+   - Rust ⭐⭐⭐⭐⭐
+   - Go ⭐⭐⭐⭐
+   - Java ⭐⭐⭐
 
-- [Go Concurrency Patterns](https://go.dev/blog/pipelines)
-- [Java Concurrency in Practice](https://jcip.net/)
-- [Rust Async Book](https://rust-lang.async.rs/)
-- [Effective Go](https://golang.org/doc/effective_go)
+---
 
-## 🎯 Kesimpulan
+## **Karakteristik Utama Setiap Bahasa**
 
-Hasil benchmark menunjukkan bahwa ketiga bahasa memiliki kapabilitas concurrency yang mature dengan trade-offs masing-masing:
+### **1. Rust**
 
-1. Go unggul dalam simplicitas dan performa
-2. Java kompetitif dengan tooling mature
-3. Rust menawarkan safety guarantees dengan trade-off di complexity
+- **Keunggulan**:
 
-Pemilihan teknologi harus didasarkan pada:
+  - Zero-cost abstractions untuk concurrency.
+  - _Ownership model_ mencegah race conditions.
+  - Dukungan penuh untuk SIMD optimizations.
+  - Tidak ada _garbage collector_, memberikan efisiensi tinggi.
 
-- Use case spesifik
-- Team expertise
-- Production requirements
-- Maintenance considerations
+- **Kekurangan**:
+  - Kurva pembelajaran curam untuk pemula.
+  - Perlu optimisasi manual untuk hasil maksimal.
 
-Yang penting bukan hanya raw performance, tapi juga maintainability, reliability, dan developer productivity dalam jangka panjang.
+### **2. Go**
+
+- **Keunggulan**:
+
+  - Goroutines memungkinkan concurrent programming yang sederhana.
+  - Channel-based communication mempermudah koordinasi antar-task.
+  - Built-in race detector untuk debugging concurrency.
+  - Sangat cocok untuk aplikasi microservices.
+
+- **Kekurangan**:
+  - Tidak ada dukungan SIMD bawaan.
+  - Performanya lebih lambat dibandingkan Rust dalam tugas berat.
+
+### **3. Java**
+
+- **Keunggulan**:
+
+  - Ekosistem mature dengan banyak library dan framework.
+  - ExecutorService mempermudah implementasi concurrency.
+  - Dukungan penuh untuk aplikasi enterprise.
+  - Garbage collection yang terus diperbarui membuatnya ideal untuk aplikasi jangka panjang.
+
+- **Kekurangan**:
+  - Memori lebih boros dibanding Rust dan Go.
+  - Performanya bergantung pada JVM optimisasi (warm-up phase).
+
+---
+
+## **Kapan Harus Menggunakan Rust, Go, atau Java?**
+
+- **Gunakan Rust Jika**: Anda membutuhkan performa tinggi di aplikasi berbasis komputasi intensif.
+- **Gunakan Go Jika**: Anda membangun aplikasi berbasis microservices.
+- **Gunakan Java Jika**: Anda bekerja di aplikasi enterprise skala besar.
