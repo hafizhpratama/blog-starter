@@ -17,7 +17,6 @@ interface ArticleLayoutProps {
 }
 
 export function ArticleLayout({ meta, children }: ArticleLayoutProps) {
-  // Construct the full URL using the slug
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const articleUrl = `${baseUrl}/blog/${meta.slug}`;
 

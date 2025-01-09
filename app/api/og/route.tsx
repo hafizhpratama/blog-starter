@@ -34,10 +34,8 @@ export async function GET(request: NextRequest) {
 
     const colors = themes[theme];
 
-    // Get the origin from the request URL
     const origin = new URL(request.url).origin;
 
-    // Load fonts and profile image
     const [interRegular, interBold, profileImage] = await Promise.all([
       fetch(
         new URL(
