@@ -1,0 +1,227 @@
+---
+title: "Mengatasi Masalah Concurrency"
+description: "Panduan mendalam tentang tantangan concurrency dalam pengembangan software development dan cara mengatasinya."
+date: "March 2025"
+readTime: "10 min read"
+category: "Software Development"
+emoji: "🔄"
+slug: "mengatasi-masalah-concurrency"
+keywords:
+  [
+    "Concurrency",
+    "Race Condition",
+    "Deadlock",
+    "Resource Starvation",
+    "Synchronization",
+    "Parallel Execution",
+  ]
+---
+
+Concurrency adalah salah satu tantangan terbesar dalam dunia pengembangan software development. Masalah seperti **race condition**, **deadlock**, dan **resource starvation** dapat menyebabkan kerusakan sistem atau perilaku yang tidak terduga. Artikel ini akan membahas secara mendalam apa itu concurrency, masalah umum yang terjadi, studi kasus, dan solusi praktis untuk mengatasi berbagai masalah tersebut.
+
+## Apa Itu Concurrency?
+
+**Concurrency** adalah kemampuan program untuk menjalankan beberapa tugas (tasks) secara bersamaan atau terlihat seperti dilakukan secara paralel.
+
+Bayangkan sebuah restoran: ketika hanya ada satu pelanggan, satu pelayan dapat menangani semua permintaan. Namun, ketika restoran penuh, beberapa pelayan diperlukan untuk menangani pelanggan secara bersamaan. Dalam programming, ini berarti menjalankan banyak tasks "sekaligus" dengan pembagian waktu yang cepat, sehingga terlihat seperti parallel execution.
+
+**Kenapa Concurrency Penting?**
+
+- **Efisiensi Resource**: Memanfaatkan CPU multi-core.
+- **Responsivitas**: Meningkatkan performa aplikasi, terutama pada sistem dengan banyak pengguna.
+- **Scalability**: Membantu menangani traffic yang tinggi pada aplikasi.
+
+Namun, concurrency juga membawa tantangan unik yang membutuhkan pendekatan strategis.
+
+---
+
+## Masalah Umum dalam Concurrency
+
+Concurrency bukan tanpa risiko. Berikut adalah beberapa masalah yang sering muncul:
+
+### 1. Race Condition
+
+Terjadi ketika dua atau lebih threads mengakses resource yang sama secara bersamaan, menyebabkan hasil yang tidak terduga.
+
+**Contoh:** Jika dua threads mencoba meningkatkan nilai counter tanpa mekanisme sinkronisasi, hasil akhirnya tidak dapat diprediksi.
+
+### 2. Deadlock
+
+Deadlock terjadi ketika dua atau lebih threads saling menunggu resource yang dipegang oleh thread lain, sehingga tidak ada yang dapat melanjutkan eksekusi.
+
+### 3. Resource Starvation
+
+Situasi ini terjadi ketika sebuah thread tidak pernah mendapatkan resource yang dibutuhkan karena terus "kalah" oleh threads lain yang memiliki prioritas lebih tinggi.
+
+---
+
+## Studi Kasus dan Solusi
+
+### Race Condition pada Counter
+
+#### Masalah:
+
+```javascript
+let counter = 0;
+
+function incrementCounter() {
+  let currentValue = counter;
+  setTimeout(() => {
+    counter = currentValue + 1;
+    console.log("Current counter:", counter);
+  }, 100);
+}
+
+incrementCounter(); // Thread 1
+incrementCounter(); // Thread 2
+// Hasil tidak selalu 2!
+```
+
+#### Solusi:
+
+Menggunakan **lock** untuk sinkronisasi:
+
+```javascript
+let counter = 0;
+let isProcessing = false;
+
+async function safeIncrementCounter() {
+  while (isProcessing) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+
+  isProcessing = true;
+  try {
+    let currentValue = counter;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    counter = currentValue + 1;
+    console.log("Current counter:", counter);
+  } finally {
+    isProcessing = false;
+  }
+}
+
+safeIncrementCounter();
+safeIncrementCounter();
+// Hasil sekarang selalu benar
+```
+
+### Deadlock pada Transfer Uang
+
+#### Masalah:
+
+```javascript
+class Account {
+  constructor(name, balance) {
+    this.name = name;
+    this.balance = balance;
+    this.isLocked = false;
+  }
+
+  async transfer(targetAccount, amount) {
+    while (this.isLocked) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    this.isLocked = true;
+
+    while (targetAccount.isLocked) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    targetAccount.isLocked = true;
+
+    if (this.balance >= amount) {
+      this.balance -= amount;
+      targetAccount.balance += amount;
+      console.log(
+        `Berhasil transfer ${amount} dari ${this.name} ke ${targetAccount.name}`
+      );
+    }
+
+    targetAccount.isLocked = false;
+    this.isLocked = false;
+  }
+}
+```
+
+#### Solusi:
+
+Menggunakan **ordering** untuk mencegah deadlock:
+
+```javascript
+class SafeAccount {
+  constructor(name, balance) {
+    this.name = name;
+    this.balance = balance;
+    this.isLocked = false;
+  }
+
+  async transfer(targetAccount, amount) {
+    const [first, second] =
+      this.name < targetAccount.name
+        ? [this, targetAccount]
+        : [targetAccount, this];
+
+    try {
+      while (first.isLocked) {
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      first.isLocked = true;
+
+      while (second.isLocked) {
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      second.isLocked = true;
+
+      if (this.balance >= amount) {
+        this.balance -= amount;
+        targetAccount.balance += amount;
+        console.log(
+          `Berhasil transfer ${amount} dari ${this.name} ke ${targetAccount.name}`
+        );
+      }
+    } finally {
+      second.isLocked = false;
+      first.isLocked = false;
+    }
+  }
+}
+```
+
+---
+
+## Tips dan Best Practices
+
+1. **Gunakan Locks dengan Bijak**:
+
+   - Selalu lock resources sebelum memodifikasinya.
+   - Lepaskan lock sesegera mungkin untuk menghindari deadlock.
+
+2. **Hindari Deadlock**:
+
+   - Lock resources dalam urutan yang konsisten.
+   - Gunakan timeouts untuk operasi blocking.
+
+3. **Testing dan Monitoring**:
+
+   - Simulasikan skenario concurrency yang berbeda.
+   - Gunakan alat monitoring untuk mendeteksi masalah seperti deadlock atau resource starvation.
+
+4. **Defensive Programming**:
+
+   - Validasi semua input.
+   - Tangani edge cases dan error secara eksplisit.
+
+5. **Dokumentasi yang Jelas**:
+   - Catat asumsi, limitasi, dan cara kerja mekanisme concurrency Anda.
+
+---
+
+## Kesimpulan
+
+Concurrency bisa menjadi tantangan yang besar, tetapi dengan pendekatan yang tepat, Anda dapat menghindari masalah seperti race condition, deadlock, dan resource starvation. Ingat langkah-langkah penting ini:
+
+- Gunakan mekanisme sinkronisasi yang tepat seperti locks atau semaphores.
+- Hindari deadlock dengan memastikan urutan locking yang konsisten.
+- Uji aplikasi Anda dalam kondisi concurrency ekstrem.
+
+Dengan mengikuti panduan ini, Anda dapat membuat program concurrent yang lebih **reliable**, **scalable**, dan **efisien**. Jangan lupa untuk terus belajar dan mengeksplorasi teknik terbaru untuk menangani concurrency!
