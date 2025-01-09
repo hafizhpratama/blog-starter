@@ -1,0 +1,230 @@
+---
+title: "Algoritma Sorting: Bubble Sort, Quick Sort, Merge Sort, Heap Sort"
+description: "Pemahaman mendalam tentang beberapa algoritma sorting populer beserta kelebihan dan kekurangannya."
+date: "March 2025"
+readTime: "10 min read"
+category: "Technology"
+emoji: "📊"
+slug: "algoritma-sorting-bubble-sort-quick-sort-merge-sort-heap-sort"
+keywords:
+  [
+    "Algoritma",
+    "Sorting",
+    "Bubble Sort",
+    "Quick Sort",
+    "Merge Sort",
+    "Heap Sort",
+  ]
+---
+
+Sorting (pengurutan) adalah salah satu operasi fundamental dalam ilmu komputer. Algoritma sorting digunakan untuk mengatur elemen-elemen dalam suatu data (misalnya array atau list) dalam urutan tertentu, baik itu secara ascending (menaik) atau descending (menurun). Berikut adalah penjelasan beberapa algoritma sorting populer beserta penggunaannya di dunia nyata.
+
+---
+
+### **1. Bubble Sort**
+
+#### Penjelasan
+
+Bubble Sort adalah algoritma sorting sederhana yang bekerja dengan cara membandingkan dua elemen yang berdekatan dan menukar posisinya jika mereka berada dalam urutan yang salah. Proses ini diulangi hingga seluruh elemen terurut.
+
+#### Kelebihan:
+
+- Mudah diimplementasikan.
+- Cocok untuk dataset kecil.
+
+#### Kekurangan:
+
+- Tidak efisien untuk dataset besar (kompleksitas waktu: O(n²)).
+
+#### Penggunaan:
+
+- Digunakan dalam pengajaran dasar algoritma sorting karena konsepnya yang sederhana.
+
+#### Contoh Kode (JavaScript):
+
+```javascript
+function bubbleSort(arr) {
+  let n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        // Tukar elemen
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+  return arr;
+}
+
+// Contoh penggunaan
+const data = [64, 34, 25, 12, 22, 11, 90];
+console.log(bubbleSort(data));
+```
+
+---
+
+### **2. Quick Sort**
+
+#### Penjelasan
+
+Quick Sort adalah algoritma divide-and-conquer yang memilih elemen sebagai pivot, kemudian membagi array menjadi dua bagian: elemen yang lebih kecil dari pivot dan elemen yang lebih besar. Proses ini diulang secara rekursif.
+
+#### Kelebihan:
+
+- Sangat cepat untuk dataset besar (kompleksitas rata-rata: O(n log n)).
+
+#### Kekurangan:
+
+- Performanya bisa menurun ke O(n²) jika pivot dipilih dengan buruk.
+
+#### Penggunaan:
+
+- Digunakan dalam sistem yang memerlukan sorting cepat seperti basis data.
+
+#### Contoh Kode (JavaScript):
+
+```javascript
+function quickSort(arr) {
+  if (arr.length <= 1) return arr;
+
+  const pivot = arr[arr.length - 1];
+  const left = [];
+  const right = [];
+
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] < pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+
+  return [...quickSort(left), pivot, ...quickSort(right)];
+}
+
+// Contoh penggunaan
+const data = [10, 7, 8, 9, 1, 5];
+console.log(quickSort(data));
+```
+
+---
+
+### **3. Merge Sort**
+
+#### Penjelasan
+
+Merge Sort adalah algoritma divide-and-conquer yang membagi array menjadi dua bagian, menyortir kedua bagian secara rekursif, dan kemudian menggabungkannya kembali (merge) dalam urutan yang benar.
+
+#### Kelebihan:
+
+- Stabil dan efisien (kompleksitas waktu: O(n log n)).
+- Cocok untuk dataset besar.
+
+#### Kekurangan:
+
+- Membutuhkan memori tambahan untuk proses merge.
+
+#### Penggunaan:
+
+- Digunakan dalam sorting data di mana stabilitas sangat penting, seperti sorting data kartu.
+
+#### Contoh Kode (JavaScript):
+
+```javascript
+function mergeSort(arr) {
+  if (arr.length <= 1) return arr;
+
+  const mid = Math.floor(arr.length / 2);
+  const left = mergeSort(arr.slice(0, mid));
+  const right = mergeSort(arr.slice(mid));
+
+  return merge(left, right);
+}
+
+function merge(left, right) {
+  const result = [];
+  let i = 0,
+    j = 0;
+
+  while (i < left.length && j < right.length) {
+    if (left[i] < right[j]) {
+      result.push(left[i]);
+      i++;
+    } else {
+      result.push(right[j]);
+      j++;
+    }
+  }
+
+  return [...result, ...left.slice(i), ...right.slice(j)];
+}
+
+// Contoh penggunaan
+const data = [12, 11, 13, 5, 6, 7];
+console.log(mergeSort(data));
+```
+
+---
+
+### **4. Heap Sort**
+
+#### Penjelasan
+
+Heap Sort menggunakan struktur data heap untuk menyortir elemen. Array pertama kali diubah menjadi max-heap, kemudian elemen terbesar diambil dan heap diperbarui.
+
+#### Kelebihan:
+
+- Tidak membutuhkan memori tambahan.
+- Kompleksitas waktu: O(n log n).
+
+#### Kekurangan:
+
+- Implementasi lebih rumit dibandingkan algoritma lain.
+
+#### Penggunaan:
+
+- Digunakan dalam situasi di mana memori tambahan tidak tersedia, seperti dalam perangkat embedded.
+
+#### Contoh Kode (JavaScript):
+
+```javascript
+function heapSort(arr) {
+  const n = arr.length;
+
+  // Membuat max-heap
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    heapify(arr, n, i);
+  }
+
+  // Ekstraksi elemen satu per satu dari heap
+  for (let i = n - 1; i > 0; i--) {
+    [arr[0], arr[i]] = [arr[i], arr[0]]; // Tukar elemen
+    heapify(arr, i, 0);
+  }
+  return arr;
+}
+
+function heapify(arr, n, i) {
+  let largest = i;
+  const left = 2 * i + 1;
+  const right = 2 * i + 2;
+
+  if (left < n && arr[left] > arr[largest]) largest = left;
+  if (right < n && arr[right] > arr[largest]) largest = right;
+
+  if (largest !== i) {
+    [arr[i], arr[largest]] = [arr[largest], arr[i]];
+    heapify(arr, n, largest);
+  }
+}
+
+// Contoh penggunaan
+const data = [4, 10, 3, 5, 1];
+console.log(heapSort(data));
+```
+
+---
+
+### Kesimpulan
+
+Pemilihan algoritma sorting tergantung pada kebutuhan dan kondisi spesifik. Bubble Sort cocok untuk pengajaran, Quick Sort unggul dalam kecepatan rata-rata, Merge Sort stabil dan efisien, sedangkan Heap Sort sangat hemat memori. Dengan memahami kelebihan dan kekurangan masing-masing algoritma, Anda dapat memilih solusi terbaik untuk masalah Anda.
