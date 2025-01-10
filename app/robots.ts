@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://hafizh.pages.dev/sitemap.xml",
+    sitemap: "https://hafizh.cloudhej.com/sitemap.xml",
   };
 }

@@ -16,7 +16,7 @@ export function generateOGImageUrl({
     `/api/og`,
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://hafizh.pages.dev"
+      : "https://hafizh.cloudhej.com"
   );
 
   url.searchParams.set("title", title);
