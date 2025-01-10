@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   },
   description:
     "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.",
+  verification: {
+    google: "4mGhEUL69WT3KTSgYPKIIbJcAvGL0YrsEptQBr981nk",
+  },
   openGraph: {
     title: "Hafizh Pratama - Software Engineer",
     description:
