@@ -4,7 +4,7 @@ export default function StructuredData() {
     "@type": "Person",
     name: "Hafizh Pratama",
     jobTitle: "Software Engineer",
-    url: "https://hafizh.cloudhej.com",
+    url: process.env.NEXT_PUBLIC_BASE_URL,
     sameAs: [
       "https://github.com/hafizhpratama",
       "https://linkedin.com/in/hafizhpratama",

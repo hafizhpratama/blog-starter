@@ -5,7 +5,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await getAllArticles();
 
   const articleUrls = articles.map((article) => ({
-    url: `https://hafizh.cloudhej.com/articles/${article.slug}`,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/articles/${article.slug}`,
     lastModified: new Date(article.date),
     changeFrequency: "monthly" as const,
     priority: 0.8,
@@ -13,19 +13,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://hafizh.cloudhej.com",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://hafizh.cloudhej.com/articles",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/articles`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
-      url: "https://hafizh.cloudhej.com/projects",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/projects`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,

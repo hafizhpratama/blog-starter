@@ -24,7 +24,9 @@ const crimson = Crimson_Text({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hafizh.cloudhej.com"),
+  metadataBase: process.env.NEXT_PUBLIC_BASE_URL
+    ? new URL(process.env.NEXT_PUBLIC_BASE_URL)
+    : null,
   title: {
     template: "%s | Hafizh Pratama",
     default: "Hafizh Pratama - Software Engineer",
@@ -38,21 +40,21 @@ export const metadata: Metadata = {
     title: "Hafizh Pratama - Software Engineer",
     description:
       "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.",
-    url: "https://hafizh.cloudhej.com",
+    url: process.env.NEXT_PUBLIC_BASE_URL,
     siteName: "Hafizh Pratama",
     locale: "en_US",
     type: "website",
-    images: ["https://hafizh.cloudhej.com/thumbnail.png"],
+    images: [`${process.env.NEXT_PUBLIC_BASE_URL}/thumbnail.png`],
   },
   alternates: {
-    canonical: "https://hafizh.cloudhej.com",
+    canonical: process.env.NEXT_PUBLIC_BASE_URL,
   },
   twitter: {
     card: "summary_large_image",
     title: "Hafizh Pratama - Software Engineer",
     description:
       "A software engineer who enjoys solving problems, building efficient systems, and continuously learning. Focused on delivering practical solutions while staying humble and grounded.",
-    images: ["https://hafizh.cloudhej.com/thumbnail.png"],
+    images: [`${process.env.NEXT_PUBLIC_BASE_URL}/thumbnail.png`],
   },
 };
 

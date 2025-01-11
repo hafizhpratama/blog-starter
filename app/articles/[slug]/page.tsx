@@ -10,7 +10,7 @@ export async function generateMetadata({
 }: ArticlePageProps): Promise<Metadata> {
   const { meta } = await getArticleBySlug(params.slug);
 
-  const ogImageUrl = generateOGImageUrl({
+  const ogImageUrl = await generateOGImageUrl({
     title: meta.title,
     theme: (process.env.NEXT_PUBLIC_THEME as "light" | "dark") || "light",
   });
@@ -19,7 +19,7 @@ export async function generateMetadata({
     title: meta.title,
     description: meta.description,
     alternates: {
-      canonical: "https://hafizh.cloudhej.com/articles/" + params.slug,
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/articles/${params.slug}`,
     },
     openGraph: {
       title: meta.title,
@@ -35,7 +35,7 @@ export async function generateMetadata({
           alt: meta.title,
         },
         {
-          url: "https://hafizh.cloudhej.com/thumbnail.png",
+          url: `${process.env.NEXT_PUBLIC_BASE_URL}/thumbnail.png`,
           width: 1200,
           height: 630,
           alt: meta.title,

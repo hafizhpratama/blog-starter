@@ -12,7 +12,7 @@ export function generateOGImageUrl({
   title: string;
   theme?: "light" | "dark";
 }) {
-  const baseUrl = "https://hafizh.cloudhej.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://defaulturl.com";
   const url = new URL(`/api/og`, baseUrl);
 
   url.searchParams.set("title", encodeURIComponent(title));
