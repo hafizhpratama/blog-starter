@@ -18,7 +18,7 @@ interface ArticleLayoutProps {
 
 export function ArticleLayout({ meta, children }: ArticleLayoutProps) {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-  const articleUrl = `${baseUrl}/blog/${meta.slug}`;
+  const articleUrl = `${baseUrl}/articles/${meta.slug}`;
 
   const shareLinks = {
     twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(meta.title)}&url=${encodeURIComponent(articleUrl)}`,

@@ -186,10 +186,24 @@ export async function GET(request: NextRequest) {
             style: "normal",
           },
         ],
+        headers: {
+          "Cache-Control":
+            "public, max-age=86400, stale-while-revalidate=43200",
+        },
       }
     );
   } catch (e) {
-    console.error(e);
-    return new Response(`Failed to generate image`, { status: 500 });
+    console.error("OG Image generation failed:", e);
+    console.error("Request URL:", request.url);
+    console.error(
+      "Params:",
+      Object.fromEntries(new URL(request.url).searchParams)
+    );
+    return new Response(`Failed to generate image`, {
+      status: 500,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
   }
 }

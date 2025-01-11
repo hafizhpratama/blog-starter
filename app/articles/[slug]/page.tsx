@@ -34,6 +34,12 @@ export async function generateMetadata({
           height: 630,
           alt: meta.title,
         },
+        {
+          url: "https://hafizh.cloudhej.com/thumbnail.png",
+          width: 1200,
+          height: 630,
+          alt: meta.title,
+        },
       ],
     },
     twitter: {

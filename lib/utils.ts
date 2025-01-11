@@ -12,14 +12,10 @@ export function generateOGImageUrl({
   title: string;
   theme?: "light" | "dark";
 }) {
-  const url = new URL(
-    `/api/og`,
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : "https://hafizh.cloudhej.com"
-  );
+  const baseUrl = "https://hafizh.cloudhej.com";
+  const url = new URL(`/api/og`, baseUrl);
 
-  url.searchParams.set("title", title);
+  url.searchParams.set("title", encodeURIComponent(title));
   url.searchParams.set("theme", theme);
 
   return url.toString();
