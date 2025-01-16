@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articleUrls = articles.map((article) => ({
     url: `${process.env.NEXT_PUBLIC_BASE_URL}/articles/${article.slug}`,
     lastModified: new Date(article.date),
-    changeFrequency: "monthly" as const,
+    changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
