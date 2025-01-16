@@ -20,6 +20,9 @@ export const defaultMetadata: Metadata = {
     template: "%s | Hafizh Pratama",
   },
   description: defaultDescription,
+  icons: {
+    icon: "/favicon.ico",
+  },
   keywords: defaultKeywords,
   authors: [{ name: "Hafizh Pratama" }],
   creator: "Hafizh Pratama",
@@ -54,6 +57,9 @@ export const rpsMetadata: Metadata = {
   title: "Rock Paper Scissors Game | Interactive Browser Game",
   description:
     "Play an exciting game of Rock Paper Scissors against an AI opponent. Features lives system, scoring, and winning streaks. Perfect for quick entertainment!",
+  icons: {
+    icon: "/favicon.ico",
+  },
   keywords: [
     "rock paper scissors",
     "browser game",
@@ -84,6 +90,9 @@ export const smMetadata: Metadata = {
   title: "Classic Slot Machine Game | Interactive Casino Game",
   description:
     "Play our exciting slot machine game featuring classic fruit symbols and lucky sevens. Win big with multiple winning combinations and enjoy smooth animations!",
+  icons: {
+    icon: "/favicon.ico",
+  },
   keywords: [
     "slot machine",
     "casino game",

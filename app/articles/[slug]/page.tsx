@@ -18,6 +18,9 @@ export async function generateMetadata({
   return {
     title: meta.title,
     description: meta.description,
+    icons: {
+      icon: "/favicon.ico",
+    },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/articles/${params.slug}`,
     },
