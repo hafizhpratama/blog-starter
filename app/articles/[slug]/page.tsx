@@ -37,12 +37,6 @@ export async function generateMetadata({
           height: 630,
           alt: meta.title,
         },
-        {
-          url: `${process.env.NEXT_PUBLIC_BASE_URL}/thumbnail.png`,
-          width: 1200,
-          height: 630,
-          alt: meta.title,
-        },
       ],
     },
     twitter: {
