@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
+import remarkGfm from "remark-gfm";
+import { MermaidPre } from "../components/Mermaid";
 
 const articlesDirectory = path.join(process.cwd(), "content/articles");
 
@@ -13,16 +15,25 @@ try {
   console.error("Error creating articles directory:", error);
 }
 
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
 interface ArticleMeta {
   title: string;
   description: string;
   date: string;
+  dateModified?: string;
   readTime: string;
   category: string;
   emoji: string;
   slug: string;
   keywords: string[];
+  faqs?: FAQItem[];
 }
+
+export type { ArticleMeta, FAQItem };
 
 export async function getArticleBySlug(slug: string) {
   try {
@@ -39,6 +50,12 @@ export async function getArticleBySlug(slug: string) {
       source: fileContent,
       options: {
         parseFrontmatter: true,
+        mdxOptions: {
+          remarkPlugins: [remarkGfm],
+        },
+      },
+      components: {
+        pre: MermaidPre,
       },
     });
 

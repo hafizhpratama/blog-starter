@@ -51,9 +51,9 @@ export const defaultMetadata: Metadata = {
 };
 
 export const rpsMetadata: Metadata = {
-  metadataBase: new URL(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/games/rock-paper-scissors`
-  ),
+  metadataBase: process.env.NEXT_PUBLIC_BASE_URL
+    ? new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/games/rock-paper-scissors`)
+    : undefined,
   title: "Rock Paper Scissors Game | Interactive Browser Game",
   description:
     "Play an exciting game of Rock Paper Scissors against an AI opponent. Features lives system, scoring, and winning streaks. Perfect for quick entertainment!",
@@ -84,9 +84,9 @@ export const rpsMetadata: Metadata = {
 };
 
 export const smMetadata: Metadata = {
-  metadataBase: new URL(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/games/slot-machine`
-  ),
+  metadataBase: process.env.NEXT_PUBLIC_BASE_URL
+    ? new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/games/slot-machine`)
+    : undefined,
   title: "Classic Slot Machine Game | Interactive Casino Game",
   description:
     "Play our exciting slot machine game featuring classic fruit symbols and lucky sevens. Win big with multiple winning combinations and enjoy smooth animations!",

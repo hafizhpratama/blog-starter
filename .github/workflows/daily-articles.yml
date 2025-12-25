@@ -1,0 +1,105 @@
+name: Daily Article Generation
+
+on:
+  # Run twice daily at 8:00 AM and 8:00 PM WIB (Indonesia Time, UTC+7)
+  schedule:
+    - cron: '0 1 * * *'   # 8:00 AM WIB (1:00 AM UTC)
+    - cron: '0 13 * * *'  # 8:00 PM WIB (1:00 PM UTC)
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      article_count:
+        description: 'Number of articles to generate'
+        required: false
+        default: '2'
+
+# Permissions needed to push commits
+permissions:
+  contents: write
+
+jobs:
+  generate-articles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install tsx for script execution
+        run: npm install -g tsx
+
+      - name: Generate Articles
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://hafizh.cloudhej.com' }}
+          NEXT_PUBLIC_BASE_URL: ${{ vars.SITE_URL || 'https://hafizh.cloudhej.com' }}
+        run: |
+          echo "🚀 Starting article generation..."
+          npx tsx scripts/generate-articles.ts
+          echo "✅ Article generation complete!"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Get today's date
+          DATE=$(date +'%Y-%m-%d')
+
+          # Count new articles
+          NEW_ARTICLES=$(git diff --staged --name-only | grep "content/articles/.*\.mdx$" | wc -l)
+
+          # Create commit message
+          git commit -m "✨ Auto-generated ${NEW_ARTICLES} article(s) - ${DATE}
+
+          🤖 Generated with DeepSeek R1 via OpenRouter API
+          📝 Cloudflare Pages will auto-deploy on push"
+
+          git push
+
+      # Cloudflare Pages auto-deploys on push, but you can also trigger manually
+      - name: Trigger Cloudflare Pages Deploy (Optional)
+        if: steps.changes.outputs.has_changes == 'true' && vars.CLOUDFLARE_DEPLOY_HOOK != ''
+        run: |
+          curl -X POST "${{ vars.CLOUDFLARE_DEPLOY_HOOK }}"
+          echo "🚀 Triggered Cloudflare Pages deployment"
+
+      - name: Summary
+        run: |
+          echo "## Article Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment:** Cloudflare Pages (auto-deploy on push)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "scripts/data/generated-log.json" ]; then
+            echo "**Total Articles Generated:** $(cat scripts/data/generated-log.json | grep -c '"slug"')" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Recent Articles:" >> $GITHUB_STEP_SUMMARY
+          ls -t content/articles/*.mdx 2>/dev/null | head -5 | while read f; do
+            echo "- $(basename "$f" .mdx)" >> $GITHUB_STEP_SUMMARY
+          done

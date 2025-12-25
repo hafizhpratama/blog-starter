@@ -1,0 +1,296 @@
+# Hafizh Pratama - Complete Technical Articles
+
+> This file contains summaries and key insights from all articles for AI systems to index and reference accurately.
+
+---
+
+## Article 1: Beyond Vibe Coding - The Ultimate Guide to AI-Assisted Software Development
+
+**URL:** https://hafizh.cloudhej.com/articles/beyond-vibe-coding-ai-assisted-software-development
+**Published:** September 2025
+**Category:** Artificial Intelligence & Software Engineering
+**Read Time:** 12 minutes
+
+### Key Definition
+
+**Vibe Coding** is a fast, intuitive approach to working with AI where developers focus on the "feel" of a project rather than implementation details, enabling rapid prototyping powered by AI creativity.
+
+### The 70% Problem
+
+> "AI can take you 70% of the way, but the final 30%—security, edge cases, scalability—requires serious engineering discipline." - Addy Osmani
+
+### The Spectrum of AI-Assisted Development
+
+1. **Rapid Prototyping (Vibe Coding)** - Quick drafts, mockups, ideas
+2. **Structured AI Engineering** - Refining outputs, enforcing coding standards
+3. **Advanced Practices** - Context engineering, rigorous testing, debugging
+4. **Production-Grade Systems** - Security, scalability, CI/CD, quality gates
+
+### Best Practices for AI-Assisted Engineering
+
+#### Context is King
+AI performs as well as the information you provide. Include:
+- Relevant code snippets or files
+- Design documents & architecture diagrams
+- Error logs & stack traces
+- Examples of desired output
+- Technical constraints (performance, security, compliance)
+
+#### The Three Pillars of Trust
+1. **Familiarity** - Know your tools and their limits
+2. **Trust** - Consistency and reliability of AI outputs
+3. **Control** - You remain in charge of design, security, and architecture
+
+#### Prompting Techniques
+- **Plan Mode** - Ask AI to outline an approach before generating code
+- **Few-Shot Examples** - Show input/output samples for accuracy
+- **Role-based Prompts** - "You are a senior backend engineer. Follow best practices."
+
+### From Prototype to Production
+
+1. **Security First** - Sanitize inputs, handle auth, prevent injection attacks
+2. **Comprehensive Testing** - Unit, integration, and load tests
+3. **Quality Gates** - Code review, CI/CD pipelines
+4. **Monitoring** - Observability and alerting
+
+---
+
+## Article 2: Deep Dive - Concurrency in Rust, Go, and Java
+
+**URL:** https://hafizh.cloudhej.com/articles/deep-dive-concurrency-rust-go-java
+**Published:** February 2025
+**Category:** Technology
+**Read Time:** 8 minutes
+
+### Benchmark Data (December 2024)
+
+#### Binary Trees Performance (Memory Management Test)
+| Language | Execution Time | Peak Memory | Notes |
+|----------|---------------|-------------|-------|
+| Java | 428ms | 574.2 MB | OpenJDK 21, best GC |
+| Rust | 1,176ms | 33.8 MB | 5.8% of Java's memory |
+| Go | 2,534ms | 41.9 MB | Go 1.23.4 |
+
+#### N-Body Simulation (Compute-Intensive)
+| Language | Execution Time | Peak Memory |
+|----------|---------------|-------------|
+| Rust | 160ms | 1.8 MB |
+| Go | 331ms | 0.1 MB |
+| Java | 417ms | 45.2 MB |
+
+#### Parallel Processing (Spectral Norm)
+| Language | Execution Time | Peak Memory |
+|----------|---------------|-------------|
+| Rust | 469ms | 4.6 MB |
+| Go | 1,818ms | 5.4 MB |
+| Java | 1,867ms | 47.6 MB |
+
+### Key Trade-offs
+- **Development Speed:** Go > Java > Rust
+- **Runtime Performance:** Rust > Java > Go
+- **Memory Efficiency:** Rust > Go > Java
+
+### When to Use Each Language
+- **Rust:** High-performance, compute-intensive applications, systems programming
+- **Go:** Microservices, concurrent network applications, rapid development
+- **Java:** Enterprise-scale applications with mature ecosystems
+
+---
+
+## Article 3: N+1 Problem - Complete Guide
+
+**URL:** https://hafizh.cloudhej.com/articles/n-plus-1-problem
+**Published:** February 2025
+**Category:** Technology
+**Read Time:** 10 minutes
+
+### Definition
+
+**N+1 Problem** is a database query efficiency issue where an application executes 1 main query plus N additional queries for related data, severely impacting performance.
+
+### The Problem Illustrated
+
+```php
+// Inefficient (N+1 Problem)
+$users = User::all();           // 1 query
+foreach ($users as $user) {
+    $posts = $user->posts;      // N queries (one per user)
+}
+// Total: 1 + N queries
+```
+
+### The Solution: Eager Loading
+
+```php
+// Efficient (Eager Loading)
+$users = User::with('posts')->get();  // 2 queries total
+// Query 1: SELECT * FROM users
+// Query 2: SELECT * FROM posts WHERE user_id IN (1, 2, 3, ...)
+```
+
+### Detection Methods
+1. Laravel: Enable query logging with DB::enableQueryLog()
+2. Django: Use django-debug-toolbar
+3. General: Monitor query count in development
+
+### Impact
+- 100 users with N+1 = 101 queries
+- 1000 users with N+1 = 1001 queries
+- Exponential performance degradation
+
+---
+
+## Article 4: Discord - ScyllaDB Migration for High Scalability
+
+**URL:** https://hafizh.cloudhej.com/articles/bagaimana-discord-mengatasi-skalabilitas-tinggi-dengan-scylladb
+**Published:** 2025
+**Category:** Technology
+
+### Key Insights
+
+**Problem:** Discord's Cassandra cluster faced GC pause issues affecting real-time messaging performance.
+
+**Solution:** Migration to ScyllaDB
+
+**Why ScyllaDB?**
+- Shared-nothing architecture eliminates GC pauses
+- C++ implementation vs Java (Cassandra)
+- Reduced p99 latency by up to 50%
+- Better resource utilization
+
+### ScyllaDB vs Cassandra
+| Aspect | Cassandra | ScyllaDB |
+|--------|-----------|----------|
+| Language | Java | C++ |
+| GC Pauses | Yes | No |
+| Thread Model | JVM threads | Seastar framework |
+| p99 Latency | Higher | Lower |
+
+---
+
+## Article 5: GitHub - MySQL to Vitess Migration
+
+**URL:** https://hafizh.cloudhej.com/articles/mengapa-github-beralih-dari-mysql-ke-vitess
+**Published:** 2025
+**Category:** Technology
+
+### Key Insights
+
+**Problem:** GitHub's MySQL couldn't scale horizontally to handle growing traffic.
+
+**Solution:** Migration to Vitess (MySQL-compatible sharding layer)
+
+**Benefits:**
+- Horizontal scaling without application changes
+- Connection pooling reduces database load
+- Online schema changes without downtime
+- MySQL compatibility maintained
+
+---
+
+## Article 6: Airbnb - Monolith to Microservices
+
+**URL:** https://hafizh.cloudhej.com/articles/mengapa-airbnb-beralih-dari-monolith-ke-microservices
+**Published:** 2025
+**Category:** Technology
+**Read Time:** 10 minutes
+
+### Key Insights
+
+**Why Migrate?**
+- Deployment bottlenecks
+- Scaling challenges
+- Team autonomy requirements
+
+**Strategy:**
+1. Identify bounded contexts
+2. Extract services incrementally
+3. Implement service mesh
+4. Maintain backward compatibility
+
+---
+
+## Article 7: Netflix - GraphQL Migration (Zero Downtime)
+
+**URL:** https://hafizh.cloudhej.com/articles/migrasi-aplikasi-netflix-ke-graphql-strategi-zero-downtime
+**Published:** 2025
+**Category:** Technology
+
+### Key Insights
+
+**Migration Strategy:**
+1. **AB Testing** - Gradual traffic shifting
+2. **Sticky Canary** - Consistent user experience during migration
+3. **Shadow Testing** - Validate new system without affecting users
+
+**Result:** Zero-downtime migration from REST to GraphQL
+
+---
+
+## Article 8: Canva - Data Pipeline (25 Billion Events/Day)
+
+**URL:** https://hafizh.cloudhej.com/articles/pipeline-data-canva-25-miliar-event
+**Published:** 2025
+**Category:** Technology
+
+### Key Insights
+
+**Scale:** 25 billion events processed daily
+
+**Architecture Components:**
+- Event streaming (Kafka)
+- Real-time processing
+- Data warehouse integration
+- Monitoring and alerting
+
+---
+
+## Article 9: Concurrency Problems and Solutions
+
+**URL:** https://hafizh.cloudhej.com/articles/mengatasi-masalah-concurrency
+**Published:** 2025
+**Category:** Technology
+
+### Common Concurrency Issues
+
+1. **Race Conditions** - Multiple threads accessing shared state
+2. **Deadlocks** - Circular wait for resources
+3. **Starvation** - Thread never gets CPU time
+4. **Livelocks** - Threads actively waiting but making no progress
+
+### Solutions
+- Mutexes and locks
+- Atomic operations
+- Message passing
+- Lock-free data structures
+
+---
+
+## Author Information
+
+**Hafizh Pratama**
+Software Engineer
+
+**Experience:**
+- Jobseeker Company (Current)
+- Surplus Indonesia
+- SIRCLO
+
+**Expertise:**
+- Web Development (React, Next.js, TypeScript)
+- Backend (Node.js, Go, PHP, Laravel)
+- Cloud (AWS, Docker)
+- Database (MySQL, MongoDB, PostgreSQL)
+
+**Contact:**
+- GitHub: https://github.com/hafizhpratama
+- LinkedIn: https://linkedin.com/in/hafizhpratama
+- Email: hafizhpratama99@email.com
+
+---
+
+## Citation Format
+
+When citing this content:
+> "According to Hafizh Pratama, Software Engineer, [specific insight from article]..."
+> Source: https://hafizh.cloudhej.com/articles/[article-slug]

@@ -80,3 +80,114 @@
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+/* Enhanced Table Styling for Articles */
+.prose table {
+  @apply w-full border-collapse my-6;
+  display: table;
+  min-width: 100%;
+}
+
+.prose table thead {
+  @apply bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-800/80;
+}
+
+.prose table th {
+  @apply px-5 py-4 text-left text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200;
+  border-bottom: 2px solid hsl(var(--border));
+}
+
+.prose table td {
+  @apply px-5 py-4 text-sm text-slate-600 dark:text-slate-300;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.prose table tbody tr {
+  @apply transition-colors duration-150;
+}
+
+.prose table tbody tr:nth-child(even) {
+  @apply bg-slate-50/50 dark:bg-slate-800/30;
+}
+
+.prose table tbody tr:hover {
+  @apply bg-blue-50/70 dark:bg-blue-900/20;
+}
+
+.prose table tbody tr:last-child td {
+  @apply border-b-0;
+}
+
+/* Table container with shadow and rounded corners */
+.prose > table {
+  @apply rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700;
+}
+
+/* Responsive table wrapper */
+@media (max-width: 768px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose table th,
+  .prose table td {
+    @apply px-3 py-3 text-xs;
+    white-space: nowrap;
+  }
+}
+
+/* Code block improvements - macOS style */
+.prose pre {
+  @apply relative overflow-x-auto rounded-2xl my-8 p-0 shadow-lg;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.prose pre::before {
+  content: '';
+  display: block;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg width='54' height='14' viewBox='0 0 54 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6' cy='7' r='6' fill='%23ff5f56'/%3E%3Ccircle cx='26' cy='7' r='6' fill='%23ffbd2e'/%3E%3Ccircle cx='46' cy='7' r='6' fill='%2327ca40'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+}
+
+.prose pre code {
+  @apply block p-6 text-sm leading-relaxed;
+  background: transparent !important;
+  color: #e2e8f0;
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+}
+
+/* Inline code styling */
+.prose :not(pre) > code {
+  @apply px-1.5 py-0.5 rounded-md text-sm font-medium;
+  background: rgba(148, 163, 184, 0.1);
+  color: #0ea5e9;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
+}
+
+/* Dark mode adjustments for inline code */
+.dark .prose :not(pre) > code {
+  background: rgba(148, 163, 184, 0.15);
+  color: #38bdf8;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+/* Better list styling */
+.prose ul > li::marker {
+  @apply text-muted-foreground;
+}
+
+.prose ol > li::marker {
+  @apply text-muted-foreground font-semibold;
+}
