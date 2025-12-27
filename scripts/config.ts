@@ -48,8 +48,6 @@ export const CONFIG = {
   // File Paths
   paths: {
     articlesDir: "content/articles",
-    topicsQueue: "scripts/data/topics-queue.json",
-    generatedLog: "scripts/data/generated-log.json",
   },
 } as const;
 

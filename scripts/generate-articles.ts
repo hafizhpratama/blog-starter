@@ -1,14 +1,13 @@
 /**
- * GOD-TIER AI Article Generator
+ * Fully Automated AI Article Generator
  *
- * Multi-step generation process:
- * 1. Deep Research - Understand topic like a PhD expert
- * 2. Strategic Outline - Plan for maximum SEO impact
- * 3. Expert Writing - Create authoritative content
- * 4. FAQ Generation - Target featured snippets
- * 5. SEO Optimization - Perfect metadata
+ * Every run:
+ * 1. Picks random categories based on weights
+ * 2. AI generates fresh unique topics (checks existing articles)
+ * 3. Multi-step content generation for quality
+ * 4. Saves articles with proper metadata
  *
- * Uses DeepSeek V3 FREE via OpenRouter
+ * Uses DeepSeek R1 FREE via OpenRouter
  *
  * Usage:
  *   npx ts-node scripts/generate-articles.ts
@@ -17,20 +16,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { CONFIG } from './config';
+import { CONFIG, Category } from './config';
 import { PROMPTS } from './prompts';
-import {
-  Topic,
-  getNextTopics,
-  updateTopicStatus,
-  getExistingArticleTitles,
-  logGeneratedArticle,
-  seedInitialTopics,
-  needsTopicRefill,
-  getRandomCategory,
-  addTopics,
-  initializeDataFiles,
-} from './topics';
 
 // Types
 interface OpenRouterResponse {
@@ -54,8 +41,16 @@ interface FAQ {
   answer: string;
 }
 
+interface GeneratedTopic {
+  title: string;
+  targetKeyword: string;
+  searchIntent: string;
+  difficulty: string;
+  category: string;
+}
+
 // Rate limiting for free tier
-const RATE_LIMIT_DELAY = 3000; // 3 seconds between calls
+const RATE_LIMIT_DELAY = 3000;
 
 async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -117,7 +112,7 @@ Always output exactly what is requested. Be comprehensive, specific, and valuabl
       }
 
       const data = (await response.json()) as OpenRouterResponse;
-      await delay(RATE_LIMIT_DELAY); // Rate limiting delay
+      await delay(RATE_LIMIT_DELAY);
       return data.choices[0]?.message?.content || '';
     } catch (error) {
       if (attempt === retries) throw error;
@@ -129,11 +124,10 @@ Always output exactly what is requested. Be comprehensive, specific, and valuabl
   throw new Error('All retry attempts failed');
 }
 
-// Parse JSON from AI response (handles markdown code blocks)
+// Parse JSON from AI response
 function parseJsonResponse<T>(response: string): T {
   let cleaned = response.trim();
 
-  // Remove markdown code blocks
   if (cleaned.startsWith('```json')) {
     cleaned = cleaned.slice(7);
   } else if (cleaned.startsWith('```')) {
@@ -143,13 +137,65 @@ function parseJsonResponse<T>(response: string): T {
     cleaned = cleaned.slice(0, -3);
   }
 
-  // Find JSON array or object
   const jsonMatch = cleaned.match(/[\[{][\s\S]*[\]}]/);
   if (jsonMatch) {
     cleaned = jsonMatch[0];
   }
 
   return JSON.parse(cleaned.trim());
+}
+
+// Get weighted random category
+function getRandomCategory(): Category {
+  const totalWeight = CONFIG.categories.reduce((sum, cat) => sum + cat.weight, 0);
+  let random = Math.random() * totalWeight;
+
+  for (const category of CONFIG.categories) {
+    random -= category.weight;
+    if (random <= 0) {
+      return category;
+    }
+  }
+
+  return CONFIG.categories[0];
+}
+
+// Get existing article slugs to avoid duplicates
+function getExistingArticleSlugs(): string[] {
+  const articlesDir = path.join(process.cwd(), CONFIG.paths.articlesDir);
+
+  if (!fs.existsSync(articlesDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(articlesDir)
+    .filter((f) => f.endsWith('.mdx'))
+    .map((f) => f.replace('.mdx', ''));
+}
+
+// Get existing article titles
+function getExistingArticleTitles(): string[] {
+  const articlesDir = path.join(process.cwd(), CONFIG.paths.articlesDir);
+
+  if (!fs.existsSync(articlesDir)) {
+    return [];
+  }
+
+  const files = fs.readdirSync(articlesDir);
+  const titles: string[] = [];
+
+  for (const file of files) {
+    if (file.endsWith('.mdx')) {
+      const content = fs.readFileSync(path.join(articlesDir, file), 'utf-8');
+      const titleMatch = content.match(/title:\s*["'](.+)["']/);
+      if (titleMatch) {
+        titles.push(titleMatch[1]);
+      }
+    }
+  }
+
+  return titles;
 }
 
 // Get related articles for internal linking
@@ -176,8 +222,48 @@ function getRelatedArticles(): string[] {
   return articles;
 }
 
+// Generate fresh unique topic using AI
+async function generateFreshTopic(category: Category, existingTitles: string[]): Promise<GeneratedTopic> {
+  console.log(`    🎲 Generating fresh topic for: ${category.name}...`);
+
+  const prompt = `You are a trend analyst specializing in ${category.name}. Generate ONE unique article topic.
+
+REQUIREMENTS:
+- Must be highly searchable (real keyword people search for)
+- Must be timely and relevant for 2025
+- Must NOT be similar to any existing topics below
+- Must provide real value to readers
+
+EXISTING ARTICLES TO AVOID (do not create similar topics):
+${existingTitles.slice(0, 30).map((t) => `- ${t}`).join('\n')}
+
+Content types to choose from:
+- "How to" guides (educational)
+- "What is" explainers (informational)
+- "X vs Y" comparisons (commercial)
+- "Best/Top" lists (transactional)
+- News analysis, predictions, or trends (timely)
+
+OUTPUT FORMAT (JSON object):
+{
+  "title": "Compelling Article Title (include keyword, max 60 chars)",
+  "targetKeyword": "primary search keyword",
+  "searchIntent": "informational|transactional|commercial",
+  "difficulty": "low|medium|high",
+  "category": "${category.name}"
+}
+
+Generate exactly 1 topic. Output ONLY valid JSON.`;
+
+  const response = await callOpenRouter(prompt, 500);
+  const topic = parseJsonResponse<GeneratedTopic>(response);
+
+  console.log(`    ✓ Topic: ${topic.title}`);
+  return topic;
+}
+
 // STEP 1: Deep Research
-async function conductResearch(topic: Topic): Promise<string> {
+async function conductResearch(topic: GeneratedTopic): Promise<string> {
   console.log('    📚 Step 1/5: Conducting deep research...');
   const prompt = PROMPTS.deepResearch(topic.title, topic.category);
   const research = await callOpenRouter(prompt, 4000);
@@ -186,7 +272,7 @@ async function conductResearch(topic: Topic): Promise<string> {
 }
 
 // STEP 2: Strategic Outline
-async function createOutline(topic: Topic, research: string): Promise<string> {
+async function createOutline(topic: GeneratedTopic, research: string): Promise<string> {
   console.log('    📋 Step 2/5: Creating strategic outline...');
   const prompt = PROMPTS.strategicOutline(topic.title, research, topic.targetKeyword);
   const outline = await callOpenRouter(prompt, 3000);
@@ -196,11 +282,11 @@ async function createOutline(topic: Topic, research: string): Promise<string> {
 
 // STEP 3: Generate Article Content
 async function generateArticleContent(
-  topic: Topic,
+  topic: GeneratedTopic,
   research: string,
   outline: string
 ): Promise<string> {
-  console.log('    ✍️  Step 3/5: Writing god-tier article...');
+  console.log('    ✍️  Step 3/5: Writing article...');
 
   const relatedArticles = getRelatedArticles();
   const prompt = PROMPTS.articleGeneration(
@@ -218,8 +304,8 @@ async function generateArticleContent(
 }
 
 // STEP 4: Generate FAQ
-async function generateFAQ(topic: Topic, content: string): Promise<FAQ[]> {
-  console.log('    ❓ Step 4/5: Generating FAQ for rich snippets...');
+async function generateFAQ(topic: GeneratedTopic, content: string): Promise<FAQ[]> {
+  console.log('    ❓ Step 4/5: Generating FAQ...');
 
   const prompt = PROMPTS.faqGeneration(topic.title, topic.targetKeyword, content);
   const response = await callOpenRouter(prompt, 2000);
@@ -228,22 +314,19 @@ async function generateFAQ(topic: Topic, content: string): Promise<FAQ[]> {
     const faqs = parseJsonResponse<FAQ[]>(response);
     console.log(`    ✓ Generated ${faqs.length} FAQs`);
     return faqs;
-  } catch (error) {
+  } catch {
     console.log('    ⚠️ FAQ parsing failed, using defaults');
     return [
       {
         question: `What is ${topic.targetKeyword}?`,
-        answer: `${topic.targetKeyword} refers to the main concept covered in this comprehensive guide. Read the full article for detailed information.`,
+        answer: `${topic.targetKeyword} refers to the main concept covered in this comprehensive guide.`,
       },
     ];
   }
 }
 
 // STEP 5: Generate SEO Metadata
-async function generateMetadata(
-  content: string,
-  topic: Topic
-): Promise<ArticleMetadata> {
+async function generateMetadata(content: string, topic: GeneratedTopic): Promise<ArticleMetadata> {
   console.log('    🎯 Step 5/5: Optimizing SEO metadata...');
 
   const prompt = PROMPTS.metadataGeneration(content, topic.title, topic.targetKeyword);
@@ -253,7 +336,7 @@ async function generateMetadata(
     const metadata = parseJsonResponse<ArticleMetadata>(response);
     console.log(`    ✓ Metadata: ${metadata.slug}`);
     return metadata;
-  } catch (error) {
+  } catch {
     console.log('    ⚠️ Metadata parsing failed, generating from topic');
     return {
       title: topic.title.slice(0, 60),
@@ -287,12 +370,12 @@ function formatDate(): string {
   return `${months[now.getMonth()]} ${now.getFullYear()}`;
 }
 
-// Count words in content
+// Count words
 function countWords(content: string): number {
   return content.split(/\s+/).filter(Boolean).length;
 }
 
-// Fix tables that are inside list items (breaks MDX rendering)
+// Fix tables in lists
 function fixTablesInLists(content: string): string {
   const lines = content.split('\n');
   const result: string[] = [];
@@ -300,28 +383,22 @@ function fixTablesInLists(content: string): string {
 
   while (i < lines.length) {
     const line = lines[i];
-
-    // Check if this is a list item followed by a table
     const isListItem = /^(\s*)[-*\d.]+\s/.test(line);
     const nextLineIsTable = lines[i + 1] && /^\s*\|/.test(lines[i + 1]);
 
     if (isListItem && nextLineIsTable) {
-      // Extract the list item text without the table
       result.push(line);
-      result.push(''); // Add blank line
+      result.push('');
 
-      // Find and extract the table
       const tableLines: string[] = [];
       let j = i + 1;
       while (j < lines.length && (lines[j].trim().startsWith('|') || lines[j].trim() === '')) {
         if (lines[j].trim().startsWith('|')) {
-          // Remove leading whitespace from table lines
           tableLines.push(lines[j].trim());
         }
         j++;
       }
 
-      // Add the table without indentation
       if (tableLines.length > 0) {
         result.push(...tableLines);
         result.push('');
@@ -337,7 +414,7 @@ function fixTablesInLists(content: string): string {
   return result.join('\n');
 }
 
-// Fix malformed markdown tables and ensure proper spacing
+// Fix markdown tables
 function fixMarkdownTables(content: string): string {
   const lines = content.split('\n');
   const result: string[] = [];
@@ -347,23 +424,15 @@ function fixMarkdownTables(content: string): string {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
     const prevLine = result[result.length - 1] || '';
-
-    // Detect table separator row (e.g., |---|---|---|)
     const isSeparator = /^\|?[\s-:|]+\|[\s-:|]+\|?$/.test(line.trim());
-
-    // Detect table row (starts with | or has multiple |)
     const isTableRow = (line.trim().startsWith('|') || (line.split('|').length > 2)) && !line.startsWith('```');
-
-    // Detect if next line is a separator (means current line is table header)
     const nextLineIsSeparator = lines[i + 1] && /^\|?[\s-:|]+\|[\s-:|]+\|?$/.test(lines[i + 1].trim());
 
     if (isSeparator) {
       inTable = true;
-      // Fix separator: ensure it starts and ends with |
       const parts = line.split('|').filter(p => p.trim() !== '' || line.startsWith('|'));
       const separatorParts = parts.map(() => '---');
 
-      // Ensure proper column count
       if (tableColumnCount > 0) {
         while (separatorParts.length < tableColumnCount) {
           separatorParts.push('---');
@@ -373,28 +442,22 @@ function fixMarkdownTables(content: string): string {
       if (tableColumnCount === 0) tableColumnCount = separatorParts.length;
 
     } else if (isTableRow && (inTable || nextLineIsSeparator)) {
-      // This is a table row - ensure blank line before table starts
       if (!inTable && prevLine.trim() !== '' && !prevLine.trim().startsWith('|')) {
-        // Add blank line before table
         result.push('');
       }
 
       inTable = true;
-      // Fix table row: ensure it starts and ends with |
       let trimmedLine = line.trim();
 
-      // Remove leading/trailing | and split
       if (trimmedLine.startsWith('|')) trimmedLine = trimmedLine.slice(1);
       if (trimmedLine.endsWith('|')) trimmedLine = trimmedLine.slice(0, -1);
 
       const cells = trimmedLine.split('|').map(cell => cell.trim());
 
-      // Track column count from header row
       if (tableColumnCount === 0) {
         tableColumnCount = cells.length;
       }
 
-      // Ensure consistent column count
       while (cells.length < tableColumnCount) {
         cells.push('');
       }
@@ -402,11 +465,9 @@ function fixMarkdownTables(content: string): string {
       line = '| ' + cells.slice(0, tableColumnCount).join(' | ') + ' |';
 
     } else if (inTable && line.trim() === '') {
-      // End of table
       inTable = false;
       tableColumnCount = 0;
     } else if (inTable && !isTableRow) {
-      // Non-table line after table - end table and add blank line
       inTable = false;
       tableColumnCount = 0;
       if (prevLine.trim() !== '') {
@@ -420,72 +481,52 @@ function fixMarkdownTables(content: string): string {
   return result.join('\n');
 }
 
-// Sanitize MDX content to prevent parsing errors
+// Sanitize MDX content
 function sanitizeMDXContent(content: string): string {
-  // First, remove AI reasoning blocks (DeepSeek R1 outputs these)
   let sanitized = content
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
     .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
     .replace(/<reflection>[\s\S]*?<\/reflection>/gi, '')
     .replace(/<output>[\s\S]*?<\/output>/gi, (match) => {
-      // Keep content inside output tags, just remove the tags
       return match.replace(/<\/?output>/gi, '');
     });
 
-  // Extract and preserve code blocks
   const codeBlocks: string[] = [];
   sanitized = sanitized.replace(/```[\s\S]*?```/g, (match) => {
     codeBlocks.push(match);
     return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
   });
 
-  // Extract and preserve inline code
   const inlineCode: string[] = [];
   sanitized = sanitized.replace(/`[^`]+`/g, (match) => {
     inlineCode.push(match);
     return `__INLINE_CODE_${inlineCode.length - 1}__`;
   });
 
-  // Now sanitize the non-code content
   sanitized = sanitized
-    // Fix < followed by numbers (e.g., <1%, <10, <100)
     .replace(/<(\d+)/g, 'less than $1')
-    // Fix > followed by numbers (e.g., >50%, >100)
     .replace(/>(\d+)/g, 'greater than $1')
-    // Fix <= and >= patterns
     .replace(/<=\s*(\d+)/g, '≤$1')
     .replace(/>=\s*(\d+)/g, '≥$1')
-    // Fix < at start of table cells
     .replace(/\|\s*<(\d)/g, '| less than $1')
     .replace(/\|\s*>(\d)/g, '| greater than $1')
-    // Fix standalone < and > in text
     .replace(/(\s)<(\s)/g, '$1&lt;$2')
     .replace(/(\s)>(\s)/g, '$1&gt;$2')
-    // Fix arrow patterns
     .replace(/\s->\s/g, ' → ')
     .replace(/\s<-\s/g, ' ← ')
-    // Clean up whitespace
     .replace(/\n{4,}/g, '\n\n\n')
     .replace(/[ \t]+$/gm, '');
 
-  // Restore code blocks
   codeBlocks.forEach((block, i) => {
     sanitized = sanitized.replace(`__CODE_BLOCK_${i}__`, block);
   });
 
-  // Restore inline code
   inlineCode.forEach((code, i) => {
     sanitized = sanitized.replace(`__INLINE_CODE_${i}__`, code);
   });
 
-  // Note: Mermaid diagrams are now supported, no need to remove them
-  // sanitized = removeMermaidDiagrams(sanitized);
-
-  // Fix tables inside list items
   sanitized = fixTablesInLists(sanitized);
-
-  // Fix malformed tables
   sanitized = fixMarkdownTables(sanitized);
 
   return sanitized.trim();
@@ -514,7 +555,7 @@ function createMDXContent(
         .replace(/\n/g, ' ')
         .replace(/<(\d)/g, 'less than $1')
         .replace(/>(\d)/g, 'greater than $1')
-        .replace(/:\s*$/g, '.') // Fix trailing colons that break YAML
+        .replace(/:\s*$/g, '.')
         .trim();
       return `  - question: "${question}"\n    answer: "${answer}"`;
     })
@@ -537,7 +578,13 @@ ${sanitizeMDXContent(content)}
 `;
 }
 
-// Save article to file
+// Check if slug already exists
+function slugExists(slug: string): boolean {
+  const existingSlugs = getExistingArticleSlugs();
+  return existingSlugs.includes(slug);
+}
+
+// Save article
 function saveArticle(slug: string, content: string): string {
   const articlesDir = path.join(process.cwd(), CONFIG.paths.articlesDir);
 
@@ -551,138 +598,78 @@ function saveArticle(slug: string, content: string): string {
   return filePath;
 }
 
-// Generate new topics if queue is low
-async function refillTopicsIfNeeded(): Promise<void> {
-  if (!needsTopicRefill()) {
-    return;
-  }
-
-  console.log('📝 Refilling topics queue...');
-  const category = getRandomCategory();
-  const existingTopics = getExistingArticleTitles();
-
-  const prompt = PROMPTS.topicGeneration(category.name, existingTopics);
-  const response = await callOpenRouter(prompt, 2000);
-
-  try {
-    const topics = parseJsonResponse<
-      Array<{
-        title: string;
-        targetKeyword: string;
-        searchIntent: string;
-        difficulty: string;
-        category: string;
-      }>
-    >(response);
-
-    addTopics(
-      topics.map((t) => ({
-        title: t.title,
-        targetKeyword: t.targetKeyword,
-        searchIntent: t.searchIntent as Topic['searchIntent'],
-        difficulty: t.difficulty as Topic['difficulty'],
-        category: t.category || category.name,
-      }))
-    );
-
-    console.log(`   ✓ Added ${topics.length} new topics to queue`);
-  } catch (error) {
-    console.error('   ⚠️ Failed to parse topics:', error);
-  }
-}
-
 // Main generation function
 async function generateArticles(): Promise<void> {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
-║          🚀 GOD-TIER AI ARTICLE GENERATOR 🚀                  ║
+║       🚀 FULLY AUTOMATED AI ARTICLE GENERATOR 🚀              ║
 ║                                                               ║
-║  Multi-step process for #1 Google rankings:                   ║
-║  1. Deep Research → Expert-level understanding                ║
-║  2. Strategic Outline → Maximum SEO impact                    ║
-║  3. Expert Writing → Authoritative content                    ║
-║  4. FAQ Generation → Rich snippets                            ║
-║  5. SEO Optimization → Perfect metadata                       ║
+║  Every run generates FRESH unique content:                    ║
+║  1. Random category selection (weighted)                      ║
+║  2. AI generates unique topic (avoids duplicates)             ║
+║  3. Deep research → Outline → Write → FAQ → SEO               ║
 ╚═══════════════════════════════════════════════════════════════╝
 `);
 
   console.log(`📅 Date: ${new Date().toISOString()}`);
-  console.log(`🤖 Model: ${CONFIG.openRouter.model} (FREE)`);
-  console.log(`📝 Articles per run: ${CONFIG.content.articlesPerRun}`);
-  console.log(`📊 Target word count: ${CONFIG.content.minWordCount}-${CONFIG.content.maxWordCount}\n`);
+  console.log(`🤖 Model: ${CONFIG.openRouter.model}`);
+  console.log(`📝 Articles per run: ${CONFIG.content.articlesPerRun}\n`);
 
-  // Initialize
-  initializeDataFiles();
-  seedInitialTopics();
-
-  // Refill topics if needed
-  await refillTopicsIfNeeded();
-
-  // Get topics to generate
-  const topics = getNextTopics();
-
-  if (topics.length === 0) {
-    console.log('⚠️  No pending topics found. Run: npm run generate:topics');
-    return;
-  }
-
-  console.log(`📋 Found ${topics.length} topics to generate\n`);
+  const existingTitles = getExistingArticleTitles();
+  console.log(`📚 Existing articles: ${existingTitles.length}\n`);
 
   let successCount = 0;
   let failCount = 0;
 
-  for (const topic of topics) {
+  for (let i = 0; i < CONFIG.content.articlesPerRun; i++) {
+    const category = getRandomCategory();
+
     console.log(`
 ┌───────────────────────────────────────────────────────────────┐
-│ 📝 GENERATING: ${topic.title.slice(0, 47).padEnd(47)}│
-├───────────────────────────────────────────────────────────────┤
-│ Category: ${topic.category.padEnd(51)}│
-│ Keyword:  ${topic.targetKeyword.padEnd(51)}│
-│ Intent:   ${topic.searchIntent.padEnd(51)}│
+│ 📝 ARTICLE ${i + 1}/${CONFIG.content.articlesPerRun}: ${category.name.padEnd(43)}│
 └───────────────────────────────────────────────────────────────┘
 `);
 
     try {
-      updateTopicStatus(topic.id, 'generating');
+      // Generate fresh unique topic
+      const topic = await generateFreshTopic(category, existingTitles);
 
-      // Multi-step generation process
+      // Multi-step generation
       const research = await conductResearch(topic);
       const outline = await createOutline(topic, research);
       const content = await generateArticleContent(topic, research, outline);
       const faqs = await generateFAQ(topic, content);
       const metadata = await generateMetadata(content, topic);
 
+      // Check for duplicate slug
+      if (slugExists(metadata.slug)) {
+        console.log(`    ⚠️ Slug "${metadata.slug}" exists, adding timestamp...`);
+        metadata.slug = `${metadata.slug}-${Date.now()}`;
+      }
+
       const wordCount = countWords(content);
       console.log(`\n    📊 Word count: ${wordCount}`);
 
-      // Create and save MDX file
+      // Save article
       const mdxContent = createMDXContent(metadata, content, faqs, topic.category);
       const filePath = saveArticle(metadata.slug, mdxContent);
       console.log(`    💾 Saved: ${filePath}`);
 
-      // Update status and log
-      updateTopicStatus(topic.id, 'completed', metadata.slug);
-      logGeneratedArticle({
-        slug: metadata.slug,
-        title: metadata.title,
-        category: topic.category,
-        generatedAt: new Date().toISOString(),
-        wordCount,
-      });
+      // Add to existing titles to avoid duplicates in same run
+      existingTitles.push(topic.title);
 
       successCount++;
       console.log(`
-    ✅ SUCCESS! Article generated with god-tier quality.
+    ✅ SUCCESS! Fresh article generated.
 `);
     } catch (error) {
       console.error(`\n    ❌ ERROR:`, error);
-      updateTopicStatus(topic.id, 'failed');
       failCount++;
     }
 
-    // Longer delay between articles for free tier
-    if (topics.indexOf(topic) < topics.length - 1) {
-      console.log('    ⏳ Waiting 10 seconds before next article...\n');
+    // Delay between articles
+    if (i < CONFIG.content.articlesPerRun - 1) {
+      console.log('    ⏳ Waiting 10 seconds...\n');
       await delay(10000);
     }
   }
@@ -697,11 +684,11 @@ async function generateArticles(): Promise<void> {
 `);
 
   if (successCount > 0) {
-    console.log('🚀 Articles ready! Push to GitHub to trigger deployment.\n');
+    console.log('🚀 Fresh articles ready! Push to trigger deployment.\n');
   }
 }
 
-// Run if executed directly
+// Run
 generateArticles().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);

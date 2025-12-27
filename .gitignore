@@ -28,9 +28,6 @@ yarn-error.log*
 .env
 .env*.local
 
-# Article generation data (contains generation logs)
-scripts/data/*.json
-!scripts/data/.gitkeep
 
 # vercel
 .vercel
