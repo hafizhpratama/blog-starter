@@ -1,18 +1,17 @@
 name: Daily Article Generation
 
 on:
-  # Run twice daily at 8:00 AM and 8:00 PM WIB (Indonesia Time, UTC+7)
+  # Run 5 times daily (1 article each = 5 articles/day)
+  # Spread 4 hours apart for rate limit recovery
   schedule:
-    - cron: '0 1 * * *'   # 8:00 AM WIB (1:00 AM UTC)
-    - cron: '0 13 * * *'  # 8:00 PM WIB (1:00 PM UTC)
+    - cron: '0 0 * * *'   # 07:00 AM WIB (00:00 UTC)
+    - cron: '0 4 * * *'   # 11:00 AM WIB (04:00 UTC)
+    - cron: '0 8 * * *'   # 03:00 PM WIB (08:00 UTC)
+    - cron: '0 12 * * *'  # 07:00 PM WIB (12:00 UTC)
+    - cron: '0 16 * * *'  # 11:00 PM WIB (16:00 UTC)
 
   # Allow manual trigger
   workflow_dispatch:
-    inputs:
-      article_count:
-        description: 'Number of articles to generate'
-        required: false
-        default: '2'
 
 # Permissions needed to push commits
 permissions:

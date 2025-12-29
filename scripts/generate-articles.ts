@@ -57,11 +57,15 @@ async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// OpenRouter API call with retry logic
+// Track which model is currently working best
+let currentModelIndex = 0;
+
+// OpenRouter API call with model fallback chain and rate limit recovery
 async function callOpenRouter(
   prompt: string,
   maxTokens: number = CONFIG.openRouter.maxTokens,
-  retries: number = 3
+  retriesPerModel: number = 2,
+  globalRetries: number = 2 // Retry entire chain if all rate limited
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
 
@@ -69,70 +73,113 @@ async function callOpenRouter(
     throw new Error('OPENROUTER_API_KEY environment variable is required');
   }
 
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      const response = await fetch(`${CONFIG.openRouter.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.SITE_URL || 'https://hafizh.cloudhej.com',
-          'X-Title': 'Blog Article Generator',
-        },
-        body: JSON.stringify({
-          model: CONFIG.openRouter.model,
-          messages: [
-            {
-              role: 'system',
-              content: `You are a world-class expert combining deep domain knowledge, exceptional writing skills, and elite SEO expertise. You create content that:
+  const models = CONFIG.openRouter.models;
+
+  for (let globalAttempt = 1; globalAttempt <= globalRetries; globalAttempt++) {
+    const errors: string[] = [];
+    let allRateLimited = true;
+
+    // Start from current best model, then try others
+    for (let modelOffset = 0; modelOffset < models.length; modelOffset++) {
+      const modelIndex = (currentModelIndex + modelOffset) % models.length;
+      const model = models[modelIndex];
+
+      for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
+        try {
+          const response = await fetch(`${CONFIG.openRouter.baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': process.env.SITE_URL || 'https://hafizh.cloudhej.com',
+              'X-Title': 'Blog Article Generator',
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                {
+                  role: 'system',
+                  content: `You are a world-class expert combining deep domain knowledge, exceptional writing skills, and elite SEO expertise. You create content that:
 - Demonstrates genuine expertise and authority
 - Provides unique insights not found elsewhere
 - Ranks #1 on Google through superior quality
 - Gets cited by AI systems as authoritative sources
-Always output exactly what is requested. Be comprehensive, specific, and valuable.`,
-            },
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          max_tokens: maxTokens,
-          temperature: CONFIG.openRouter.temperature,
-        }),
-      });
+Always output exactly what is requested. Be comprehensive, specific, and valuable.
+IMPORTANT: Output ONLY what is requested. NO thinking tags, NO reasoning, NO preamble.
+IMPORTANT: Write LONG, comprehensive content. Aim for 2500+ words with detailed explanations.`,
+                },
+                {
+                  role: 'user',
+                  content: prompt,
+                },
+              ],
+              max_tokens: maxTokens,
+              temperature: CONFIG.openRouter.temperature,
+            }),
+          });
 
-      if (response.status === 429) {
-        console.log(`    ⏳ Rate limited. Waiting 60 seconds... (attempt ${attempt}/${retries})`);
-        await delay(60000);
-        continue;
-      }
+          if (response.status === 429) {
+            console.log(`    ⏳ Rate limited on ${model.split('/')[1]}. Trying next model...`);
+            errors.push(`${model}: Rate limited`);
+            break; // Try next model immediately
+          }
 
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`OpenRouter API error: ${response.status} - ${error}`);
-      }
+          // Not rate limited - mark this
+          allRateLimited = false;
 
-      const data = (await response.json()) as OpenRouterResponse;
-      const content = data.choices[0]?.message?.content || '';
+          if (!response.ok) {
+            const error = await response.text();
+            errors.push(`${model}: ${response.status} - ${error.slice(0, 100)}`);
+            throw new Error(`API error: ${response.status}`);
+          }
 
-      if (!content) {
-        console.log(`    ⚠️ API returned empty content, retrying...`);
-        if (attempt < retries) {
-          await delay(5000);
-          continue;
+          const data = (await response.json()) as OpenRouterResponse;
+          const content = data.choices[0]?.message?.content || '';
+
+          if (!content || content.trim().length < 50) {
+            errors.push(`${model}: Empty or too short response`);
+            if (attempt < retriesPerModel) {
+              await delay(3000);
+              continue;
+            }
+            break; // Try next model
+          }
+
+          // Success! Update current best model
+          if (modelOffset > 0) {
+            console.log(`    ✓ Switched to ${model.split('/')[1]} (was failing on previous)`);
+            currentModelIndex = modelIndex;
+          }
+
+          await delay(RATE_LIMIT_DELAY);
+          return content;
+        } catch (error) {
+          allRateLimited = false; // Error is not rate limit
+          const msg = error instanceof Error ? error.message : 'Unknown error';
+          if (!errors.includes(`${model}: ${msg}`)) {
+            errors.push(`${model}: ${msg}`);
+          }
+          if (attempt < retriesPerModel) {
+            await delay(3000);
+          }
         }
       }
-
-      await delay(RATE_LIMIT_DELAY);
-      return content;
-    } catch (error) {
-      if (attempt === retries) throw error;
-      console.log(`    ⚠️ Attempt ${attempt} failed. Retrying...`);
-      await delay(5000);
     }
+
+    // If ALL models were rate limited, wait and retry entire chain
+    if (allRateLimited && globalAttempt < globalRetries) {
+      const waitSeconds = CONFIG.openRouter.rateLimitWaitSeconds;
+      console.log(`    ⏳ All models rate limited. Waiting ${waitSeconds}s for reset...`);
+      await delay(waitSeconds * 1000);
+      console.log(`    🔄 Retrying all models...`);
+      continue;
+    }
+
+    // Not all rate limited, or last attempt - throw error
+    throw new Error(`All models failed:\n${errors.map(e => `  - ${e}`).join('\n')}`);
   }
 
-  throw new Error('All retry attempts failed');
+  throw new Error('All retry attempts exhausted');
 }
 
 // Parse JSON from AI response
@@ -419,6 +466,120 @@ function countWords(content: string): number {
   return content.split(/\s+/).filter(Boolean).length;
 }
 
+// Validation result interface
+interface ValidationResult {
+  valid: boolean;
+  issues: string[];
+  warnings: string[];
+}
+
+// Validate article content before saving
+function validateArticleContent(
+  content: string,
+  metadata: ArticleMetadata,
+  faqs: FAQ[]
+): ValidationResult {
+  const issues: string[] = [];
+  const warnings: string[] = [];
+
+  // 1. Check word count - STRICT: minimum 1500 words for quality
+  const wordCount = countWords(content);
+  const minAcceptable = 1500; // Hard minimum for quality articles
+  if (wordCount < minAcceptable) {
+    issues.push(`Content too short: ${wordCount} words (min ${minAcceptable})`);
+  } else if (wordCount < CONFIG.content.minWordCount) {
+    warnings.push(`Content below target: ${wordCount} words (target ${CONFIG.content.minWordCount})`);
+  }
+
+  // 2. Check metadata
+  if (!metadata.title || metadata.title.length < 10) {
+    issues.push('Title missing or too short');
+  }
+  if (!metadata.slug || metadata.slug.length < 5) {
+    issues.push('Slug missing or too short');
+  }
+  if (!metadata.description || metadata.description.length < 50) {
+    warnings.push('Description missing or too short');
+  }
+  if (!metadata.keywords || metadata.keywords.length < 2) {
+    warnings.push('Not enough keywords');
+  }
+
+  // 3. Check FAQs
+  if (faqs.length === 0) {
+    warnings.push('No FAQs generated');
+  }
+
+  // 4. Check for broken markdown
+  const unclosedCodeBlocks = (content.match(/```/g) || []).length % 2 !== 0;
+  if (unclosedCodeBlocks) {
+    warnings.push('Unclosed code block detected');
+  }
+
+  // 5. Check for leftover thinking tags (shouldn't happen after sanitization)
+  if (/<think|<thinking|<reasoning/i.test(content)) {
+    warnings.push('AI thinking tags not fully removed');
+  }
+
+  // 6. Check content has actual structure
+  const hasHeadings = /^##\s+/m.test(content);
+  if (!hasHeadings) {
+    issues.push('No H2 headings found in content');
+  }
+
+  return {
+    valid: issues.length === 0,
+    issues,
+    warnings,
+  };
+}
+
+// Verify MDX file can be parsed
+function verifyMDXFile(filePath: string): ValidationResult {
+  const issues: string[] = [];
+  const warnings: string[] = [];
+
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+
+    // Check frontmatter exists
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) {
+      issues.push('No valid frontmatter found');
+    } else {
+      const frontmatter = frontmatterMatch[1];
+
+      // Check required fields
+      const requiredFields = ['title', 'description', 'date', 'slug', 'category'];
+      for (const field of requiredFields) {
+        if (!new RegExp(`^${field}:`, 'm').test(frontmatter)) {
+          issues.push(`Missing frontmatter field: ${field}`);
+        }
+      }
+
+      // Check for YAML syntax errors (common ones)
+      if (/: {2,}/.test(frontmatter)) {
+        warnings.push('Possible YAML formatting issue (extra spaces after colon)');
+      }
+    }
+
+    // Check file size (sanity check)
+    const stats = fs.statSync(filePath);
+    if (stats.size < 1000) {
+      warnings.push(`File seems small: ${stats.size} bytes`);
+    }
+
+  } catch (error) {
+    issues.push(`File read error: ${error instanceof Error ? error.message : 'Unknown'}`);
+  }
+
+  return {
+    valid: issues.length === 0,
+    issues,
+    warnings,
+  };
+}
+
 // Fix tables in lists
 function fixTablesInLists(content: string): string {
   const lines = content.split('\n');
@@ -642,6 +803,20 @@ function saveArticle(slug: string, content: string): string {
   return filePath;
 }
 
+// Article result tracking
+interface ArticleResult {
+  index: number;
+  category: string;
+  title: string;
+  slug: string;
+  status: 'success' | 'failed' | 'invalid';
+  wordCount: number;
+  filePath?: string;
+  error?: string;
+  warnings: string[];
+  model: string;
+}
+
 // Main generation function
 async function generateArticles(): Promise<void> {
   console.log(`
@@ -652,21 +827,26 @@ async function generateArticles(): Promise<void> {
 ║  1. Random category selection (weighted)                      ║
 ║  2. AI generates unique topic (avoids duplicates)             ║
 ║  3. Deep research → Outline → Write → FAQ → SEO               ║
+║  4. Validation & verification before saving                   ║
+║  5. Model fallback chain for 100% reliability                 ║
 ╚═══════════════════════════════════════════════════════════════╝
 `);
 
   console.log(`📅 Date: ${new Date().toISOString()}`);
-  console.log(`🤖 Model: ${CONFIG.openRouter.model}`);
+  console.log(`🤖 Models: ${CONFIG.openRouter.models.length} in fallback chain`);
+  console.log(`   Primary: ${CONFIG.openRouter.models[0]}`);
   console.log(`📝 Articles per run: ${CONFIG.content.articlesPerRun}\n`);
 
   const existingTitles = getExistingArticleTitles();
   console.log(`📚 Existing articles: ${existingTitles.length}\n`);
 
-  let successCount = 0;
-  let failCount = 0;
+  const results: ArticleResult[] = [];
+  const MAX_RETRIES_PER_ARTICLE = 3;
 
   for (let i = 0; i < CONFIG.content.articlesPerRun; i++) {
     const category = getRandomCategory();
+    let articleSuccess = false;
+    let lastError = '';
 
     console.log(`
 ┌───────────────────────────────────────────────────────────────┐
@@ -674,61 +854,168 @@ async function generateArticles(): Promise<void> {
 └───────────────────────────────────────────────────────────────┘
 `);
 
-    try {
-      // Generate fresh unique topic
-      const topic = await generateFreshTopic(category, existingTitles);
-
-      // Multi-step generation
-      const research = await conductResearch(topic);
-      const outline = await createOutline(topic, research);
-      const content = await generateArticleContent(topic, research, outline);
-      const faqs = await generateFAQ(topic, content);
-      const metadata = await generateMetadata(content, topic);
-
-      // Check for duplicate slug
-      if (slugExists(metadata.slug)) {
-        console.log(`    ⚠️ Slug "${metadata.slug}" exists, adding timestamp...`);
-        metadata.slug = `${metadata.slug}-${Date.now()}`;
+    // Retry loop for each article
+    for (let attempt = 1; attempt <= MAX_RETRIES_PER_ARTICLE && !articleSuccess; attempt++) {
+      if (attempt > 1) {
+        console.log(`\n    🔄 Retry attempt ${attempt}/${MAX_RETRIES_PER_ARTICLE}...`);
+        await delay(5000);
       }
 
-      const wordCount = countWords(content);
-      console.log(`\n    📊 Word count: ${wordCount}`);
+      try {
+        // Generate fresh unique topic
+        const topic = await generateFreshTopic(category, existingTitles);
 
-      // Save article
-      const mdxContent = createMDXContent(metadata, content, faqs, topic.category);
-      const filePath = saveArticle(metadata.slug, mdxContent);
-      console.log(`    💾 Saved: ${filePath}`);
+        // Multi-step generation
+        const research = await conductResearch(topic);
+        const outline = await createOutline(topic, research);
+        const content = await generateArticleContent(topic, research, outline);
+        const faqs = await generateFAQ(topic, content);
+        const metadata = await generateMetadata(content, topic);
 
-      // Add to existing titles to avoid duplicates in same run
-      existingTitles.push(topic.title);
+        // PRE-SAVE VALIDATION
+        console.log('\n    🔍 Validating content...');
+        const validation = validateArticleContent(content, metadata, faqs);
 
-      successCount++;
-      console.log(`
-    ✅ SUCCESS! Fresh article generated.
-`);
-    } catch (error) {
-      console.error(`\n    ❌ ERROR:`, error);
-      failCount++;
+        if (!validation.valid) {
+          console.log(`    ❌ Validation failed:`);
+          validation.issues.forEach(issue => console.log(`       - ${issue}`));
+          lastError = `Validation: ${validation.issues.join(', ')}`;
+          continue; // Try again
+        }
+
+        if (validation.warnings.length > 0) {
+          console.log(`    ⚠️ Warnings:`);
+          validation.warnings.forEach(warn => console.log(`       - ${warn}`));
+        }
+
+        // Check for duplicate slug
+        if (slugExists(metadata.slug)) {
+          console.log(`    ⚠️ Slug "${metadata.slug}" exists, adding timestamp...`);
+          metadata.slug = `${metadata.slug}-${Date.now()}`;
+        }
+
+        const wordCount = countWords(content);
+        console.log(`    📊 Word count: ${wordCount}`);
+
+        // Save article
+        const mdxContent = createMDXContent(metadata, content, faqs, topic.category);
+        const filePath = saveArticle(metadata.slug, mdxContent);
+        console.log(`    💾 Saved: ${filePath}`);
+
+        // POST-SAVE VERIFICATION
+        console.log('    🔎 Verifying saved file...');
+        const fileVerification = verifyMDXFile(filePath);
+
+        if (!fileVerification.valid) {
+          console.log(`    ❌ File verification failed:`);
+          fileVerification.issues.forEach(issue => console.log(`       - ${issue}`));
+          // Delete invalid file
+          fs.unlinkSync(filePath);
+          console.log(`    🗑️ Deleted invalid file`);
+          lastError = `File verification: ${fileVerification.issues.join(', ')}`;
+          continue; // Try again
+        }
+
+        // Add to existing titles to avoid duplicates in same run
+        existingTitles.push(topic.title);
+
+        // Track result
+        results.push({
+          index: i + 1,
+          category: category.name,
+          title: metadata.title,
+          slug: metadata.slug,
+          status: 'success',
+          wordCount,
+          filePath,
+          warnings: [...validation.warnings, ...fileVerification.warnings],
+          model: CONFIG.openRouter.models[currentModelIndex],
+        });
+
+        articleSuccess = true;
+        console.log(`\n    ✅ SUCCESS! Article verified and saved.`);
+
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`\n    ❌ Attempt ${attempt} failed: ${lastError}`);
+      }
+    }
+
+    // If all retries failed, record failure
+    if (!articleSuccess) {
+      results.push({
+        index: i + 1,
+        category: category.name,
+        title: 'N/A',
+        slug: 'N/A',
+        status: 'failed',
+        wordCount: 0,
+        error: lastError,
+        warnings: [],
+        model: CONFIG.openRouter.models[currentModelIndex],
+      });
     }
 
     // Delay between articles
     if (i < CONFIG.content.articlesPerRun - 1) {
-      console.log('    ⏳ Waiting 10 seconds...\n');
+      console.log('\n    ⏳ Waiting 10 seconds...\n');
       await delay(10000);
     }
   }
+
+  // DETAILED RESULTS REPORT
+  const successful = results.filter(r => r.status === 'success');
+  const failed = results.filter(r => r.status !== 'success');
 
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║                    🏁 GENERATION COMPLETE                     ║
 ╠═══════════════════════════════════════════════════════════════╣
-║  ✅ Successful: ${String(successCount).padEnd(46)}║
-║  ❌ Failed:     ${String(failCount).padEnd(46)}║
+║  ✅ Successful: ${String(successful.length).padEnd(46)}║
+║  ❌ Failed:     ${String(failed.length).padEnd(46)}║
 ╚═══════════════════════════════════════════════════════════════╝
 `);
 
-  if (successCount > 0) {
+  // Detailed success report
+  if (successful.length > 0) {
+    console.log('📋 SUCCESSFUL ARTICLES:');
+    console.log('─'.repeat(65));
+    for (const result of successful) {
+      console.log(`  ${result.index}. ${result.title.slice(0, 50)}`);
+      console.log(`     📁 ${result.filePath}`);
+      console.log(`     📊 ${result.wordCount} words | Model: ${result.model}`);
+      if (result.warnings.length > 0) {
+        console.log(`     ⚠️ Warnings: ${result.warnings.join(', ')}`);
+      }
+      console.log('');
+    }
+  }
+
+  // Detailed failure report
+  if (failed.length > 0) {
+    console.log('❌ FAILED ARTICLES:');
+    console.log('─'.repeat(65));
+    for (const result of failed) {
+      console.log(`  ${result.index}. Category: ${result.category}`);
+      console.log(`     Error: ${result.error}`);
+      console.log('');
+    }
+  }
+
+  // Final verdict
+  if (failed.length === 0) {
+    console.log('🎉 100% SUCCESS RATE! All articles generated and verified.\n');
+  } else {
+    console.log(`⚠️ ${successful.length}/${results.length} articles succeeded.\n`);
+  }
+
+  if (successful.length > 0) {
     console.log('🚀 Fresh articles ready! Push to trigger deployment.\n');
+  }
+
+  // Exit with error code if any failed (for CI/CD)
+  if (failed.length > 0) {
+    process.exitCode = 1;
   }
 }
 
