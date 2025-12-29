@@ -14,6 +14,7 @@
  *   npm run generate:articles
  */
 
+import 'dotenv/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CONFIG, Category } from './config';
@@ -112,8 +113,18 @@ Always output exactly what is requested. Be comprehensive, specific, and valuabl
       }
 
       const data = (await response.json()) as OpenRouterResponse;
+      const content = data.choices[0]?.message?.content || '';
+
+      if (!content) {
+        console.log(`    ⚠️ API returned empty content, retrying...`);
+        if (attempt < retries) {
+          await delay(5000);
+          continue;
+        }
+      }
+
       await delay(RATE_LIMIT_DELAY);
-      return data.choices[0]?.message?.content || '';
+      return content;
     } catch (error) {
       if (attempt === retries) throw error;
       console.log(`    ⚠️ Attempt ${attempt} failed. Retrying...`);
@@ -126,7 +137,18 @@ Always output exactly what is requested. Be comprehensive, specific, and valuabl
 
 // Parse JSON from AI response
 function parseJsonResponse<T>(response: string): T {
+  if (!response || response.trim() === '') {
+    throw new Error('Empty response received from API');
+  }
+
   let cleaned = response.trim();
+
+  // Remove thinking/reasoning tags that some models add
+  cleaned = cleaned
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+    .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
+    .trim();
 
   if (cleaned.startsWith('```json')) {
     cleaned = cleaned.slice(7);
@@ -142,7 +164,15 @@ function parseJsonResponse<T>(response: string): T {
     cleaned = jsonMatch[0];
   }
 
-  return JSON.parse(cleaned.trim());
+  if (!cleaned || cleaned.trim() === '') {
+    throw new Error('No JSON content found in response');
+  }
+
+  try {
+    return JSON.parse(cleaned.trim());
+  } catch (e) {
+    throw new Error(`Failed to parse JSON: ${cleaned.slice(0, 200)}...`);
+  }
 }
 
 // Get weighted random category
@@ -223,7 +253,7 @@ function getRelatedArticles(): string[] {
 }
 
 // Generate fresh unique topic using AI
-async function generateFreshTopic(category: Category, existingTitles: string[]): Promise<GeneratedTopic> {
+async function generateFreshTopic(category: Category, existingTitles: string[], retries: number = 3): Promise<GeneratedTopic> {
   console.log(`    🎲 Generating fresh topic for: ${category.name}...`);
 
   const prompt = `You are a trend analyst specializing in ${category.name}. Generate ONE unique article topic.
@@ -253,13 +283,27 @@ OUTPUT FORMAT (JSON object):
   "category": "${category.name}"
 }
 
-Generate exactly 1 topic. Output ONLY valid JSON.`;
+Generate exactly 1 topic. Output ONLY valid JSON, no thinking or reasoning tags.`;
 
-  const response = await callOpenRouter(prompt, 500);
-  const topic = parseJsonResponse<GeneratedTopic>(response);
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await callOpenRouter(prompt, 800);
+      const topic = parseJsonResponse<GeneratedTopic>(response);
 
-  console.log(`    ✓ Topic: ${topic.title}`);
-  return topic;
+      console.log(`    ✓ Topic: ${topic.title}`);
+      return topic;
+    } catch (error) {
+      console.log(`    ⚠️ Topic generation attempt ${attempt}/${retries} failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      if (attempt < retries) {
+        console.log(`    ⏳ Waiting 5 seconds before retry...`);
+        await delay(5000);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error('All topic generation attempts failed');
 }
 
 // STEP 1: Deep Research
