@@ -1,134 +1,94 @@
 /**
- * GOD-TIER AI Prompts for Ultimate Content Generation
+ * OPTIMIZED AI Prompts for God-Level Content Generation
  *
- * Multi-step approach:
- * 1. Deep Research - Understand topic like a world expert
- * 2. Strategic Outline - Plan content for maximum impact
- * 3. Expert Writing - Create authoritative, comprehensive content
- * 4. SEO Optimization - Ensure ranking dominance
+ * OPTIMIZED 4-step approach (reduced from 6 for quota efficiency):
+ * 1. Topic Generation - Fresh unique topic
+ * 2. Research + Outline (combined) - Deep research with strategic structure
+ * 3. Article Writing - Comprehensive expert content
+ * 4. FAQ + Metadata (combined) - SEO optimization in one call
+ *
+ * Saves 33% API calls while maintaining god-level quality
  */
 
 import { CONFIG } from './config';
 
 export const PROMPTS = {
   /**
-   * STEP 1: Deep Topic Research
-   * Makes AI understand the topic like a PhD expert before writing
+   * COMBINED STEP: Deep Research + Strategic Outline
+   * Saves 1 API call by combining research and outline into one prompt
    */
-  deepResearch: (topic: string, category: string) => `
-You are a world-leading expert researcher with decades of experience in ${category}. Your task is to conduct exhaustive research on a topic before any content is written.
-
-TOPIC TO RESEARCH: "${topic}"
-
-Conduct a comprehensive analysis covering:
-
-## 1. FOUNDATIONAL KNOWLEDGE
-- What is this topic at its core? Define it precisely.
-- What are the fundamental concepts everyone must understand?
-- What is the history and evolution of this topic?
-- Who are the key figures, companies, or entities involved?
-
-## 2. CURRENT STATE OF THE ART
-- What is happening RIGHT NOW (2024-2025) in this space?
-- What are the latest developments, updates, or breakthroughs?
-- What are the current statistics and data points?
-- What do the most recent studies or reports say?
-
-## 3. EXPERT-LEVEL INSIGHTS
-- What do MOST people get WRONG about this topic?
-- What are the non-obvious insights that only experts know?
-- What are the common misconceptions to debunk?
-- What nuances separate beginners from experts?
-
-## 4. PRACTICAL APPLICATION
-- How does this actually work in practice?
-- What are real-world examples and case studies?
-- What are step-by-step processes involved?
-- What tools, resources, or methods are used?
-
-## 5. COMPARATIVE ANALYSIS
-- How does this compare to alternatives?
-- What are the pros and cons?
-- When should someone choose this vs other options?
-- What are the trade-offs to consider?
-
-## 6. FUTURE OUTLOOK
-- Where is this heading in the next 1-3 years?
-- What trends are emerging?
-- What predictions are experts making?
-- What should readers watch out for?
-
-## 7. ACTIONABLE TAKEAWAYS
-- What are the key decisions readers need to make?
-- What are the concrete next steps?
-- What resources should they explore further?
-
-OUTPUT: Provide your research findings in a structured format. Be specific with numbers, names, dates, and facts. This research will be used to write the most authoritative article on the internet about this topic.
-`,
-
-  /**
-   * STEP 2: Strategic Content Outline
-   * Creates a masterplan for the article
-   */
-  strategicOutline: (topic: string, research: string, targetKeyword: string) => `
-You are a master content strategist who has helped hundreds of articles reach #1 on Google. Using the research provided, create a strategic outline for an article that will DOMINATE search results.
+  researchAndOutline: (topic: string, category: string, targetKeyword: string) => `
+You are a world-leading expert in ${category} AND a master content strategist.
 
 TOPIC: "${topic}"
 TARGET KEYWORD: "${targetKeyword}"
 
-RESEARCH FINDINGS:
-${research}
+Provide a COMBINED research and outline in TWO SECTIONS:
 
-Create a STRATEGIC OUTLINE that includes:
+=== SECTION 1: DEEP RESEARCH ===
 
-## TITLE OPTIONS (3 variations)
-- Each title must include the target keyword
-- Each must trigger clicks (curiosity, benefit, or urgency)
-- Keep under 60 characters
+Cover these areas concisely but thoroughly:
 
-## HOOK STRATEGY
-- What emotional hook will grab readers in the first 10 seconds?
-- What pain point or desire does this address?
-- What promise will the article deliver?
+1. CORE CONCEPTS: What is this? Key definitions. History if relevant.
+2. CURRENT STATE (2024-2025): Latest developments, statistics, trends.
+3. EXPERT INSIGHTS: What most people get wrong. Non-obvious knowledge.
+4. PRACTICAL APPLICATION: How it works. Real examples. Step-by-step processes.
+5. COMPARISONS: Alternatives, pros/cons, trade-offs.
+6. FUTURE: Where it's heading. Emerging trends.
 
-## CONTENT STRUCTURE
-For each section, specify:
-- H2 Heading (keyword-optimized)
-- Key points to cover (3-5 bullets)
-- Data/stats to include
-- Examples or case studies
-- Word count target
+=== SECTION 2: STRATEGIC OUTLINE ===
 
-Structure should include:
-1. Introduction (hook + promise + overview)
-2. [Main sections - 5-7 H2s with H3 subsections]
-3. Expert insights section
-4. Common mistakes/misconceptions
-5. Step-by-step guide or framework
-6. Comparison/alternatives (if applicable)
-7. Future outlook
-8. Conclusion with clear CTA
+Create a winning article structure:
 
-## FEATURED SNIPPET TARGETS
-- What "People Also Ask" questions will this answer?
-- What definitions should be included?
-- What lists or steps should be formatted for snippets?
+1. TITLE: One compelling title (include keyword, under 60 chars)
+2. HOOK: Opening strategy to grab readers immediately
+3. STRUCTURE: 5-7 H2 sections with key points for each:
+   - Introduction with hook
+   - Core explanation sections
+   - Expert insights/misconceptions
+   - Step-by-step guide or framework
+   - Comparison/alternatives
+   - Future outlook
+   - Strong conclusion with CTA
 
-## INTERNAL LINKING OPPORTUNITIES
-- What related topics should be linked?
-- Where should CTAs be placed?
+4. FEATURED SNIPPETS: 3 "People Also Ask" questions to answer
+5. UNIQUE VALUE: What makes this THE definitive resource?
 
-## UNIQUE VALUE PROPOSITION
-- What will this article have that NO OTHER article has?
-- What original insight or framework are we introducing?
-- Why will this be THE definitive resource?
+Be specific with facts, numbers, and actionable insights.
+`,
 
-OUTPUT: Provide a detailed outline that will guide the creation of a #1 ranking article.
+  // Legacy support - redirects to combined prompt
+  deepResearch: (topic: string, category: string) => `
+You are a world-leading expert in ${category}. Research "${topic}" covering:
+
+1. CORE: Definition, key concepts, history
+2. CURRENT (2024-2025): Latest developments, stats, trends
+3. INSIGHTS: Common misconceptions, expert-only knowledge
+4. PRACTICAL: Real examples, step-by-step processes
+5. COMPARISONS: Alternatives, pros/cons
+6. FUTURE: Emerging trends, predictions
+
+Be specific with numbers, names, dates. Provide actionable takeaways.
+`,
+
+  // Legacy support - kept for backwards compatibility
+  strategicOutline: (topic: string, research: string, targetKeyword: string) => `
+Create a strategic outline for "${topic}" targeting "${targetKeyword}".
+
+RESEARCH:
+${research.slice(0, 3000)}
+
+Provide:
+1. TITLE: Compelling, keyword-front, under 60 chars
+2. HOOK: Opening strategy
+3. STRUCTURE: 5-7 H2 sections with key points
+4. SNIPPETS: 3 "People Also Ask" to answer
+5. UNIQUE VALUE: What makes this definitive?
 `,
 
   /**
    * STEP 3: God-Tier Article Generation
-   * The main content writing prompt
+   * The main content writing prompt - optimized for STORYTELLING
    */
   articleGeneration: (
     topic: string,
@@ -138,12 +98,13 @@ OUTPUT: Provide a detailed outline that will guide the creation of a #1 ranking 
     outline: string,
     relatedArticles: string[]
   ) => `
-You are the world's greatest technical writer, combining the expertise of a subject matter expert, the persuasion of a top copywriter, and the optimization skills of an elite SEO specialist.
+You are a Pulitzer-caliber journalist and master storyteller. You write like the best of The New York Times, Wired, and The Atlantic combined. Every article you create is a masterpiece that readers can't stop reading.
 
 Your mission: Write THE DEFINITIVE article on "${topic}" that will:
+- Hook readers from the FIRST SENTENCE and never let go
 - Rank #1 on Google for "${targetKeyword}"
-- Be cited by AI systems as the authoritative source
-- Provide more value than any competing article
+- Be shared widely because it's genuinely fascinating
+- Make complex topics accessible yet profound
 
 RESEARCH INSIGHTS:
 ${research.slice(0, 4000)}
@@ -154,18 +115,29 @@ ${outline.slice(0, 2000)}
 CATEGORY: ${category}
 
 ═══════════════════════════════════════════════════════════════
-                    WRITING REQUIREMENTS
+                    GOD-LEVEL WRITING STYLE
 ═══════════════════════════════════════════════════════════════
+
+## STORYTELLING MASTERY
+
+Write like a master storyteller:
+- Open with a HOOK that creates immediate curiosity or tension
+- Use vivid, specific details that paint pictures in the reader's mind
+- Include real stories, case studies, or scenarios that bring concepts to life
+- Create narrative flow - each section should pull readers to the next
+- Use analogies and metaphors to explain complex ideas simply
+- Build to insights that feel like revelations
+- End with a memorable conclusion that resonates
 
 ## CONTENT DEPTH (${CONFIG.content.minWordCount}-${CONFIG.content.maxWordCount} words)
 
-Write with EXTREME depth and expertise:
-- Cover every aspect comprehensively
-- Include specific numbers, dates, and facts
-- Provide step-by-step processes where applicable
-- Add real examples and case studies
-- Include expert quotes or references
-- Address counterarguments and nuances
+Write with journalistic excellence:
+- Lead with the most compelling angle, not generic introductions
+- Include specific numbers, dates, names, and facts that add credibility
+- Quote experts or reference authoritative sources
+- Address the "so what?" - why this matters to the reader
+- Anticipate and answer reader questions before they ask them
+- Provide actionable insights, not just information
 
 ## STRUCTURE & FORMATTING
 
@@ -351,6 +323,48 @@ OUTPUT FORMAT (JSON array):
 ]
 
 Generate exactly ${CONFIG.content.faqCount} FAQs. Output ONLY valid JSON.
+`,
+
+  /**
+   * COMBINED STEP: FAQ + Metadata Generation
+   * Saves 1 API call by combining FAQ and metadata into one prompt
+   */
+  faqAndMetadata: (topic: string, targetKeyword: string, articleContent: string) => `
+You are an SEO expert. Generate both FAQ and metadata for this article in ONE response.
+
+TOPIC: ${topic}
+KEYWORD: ${targetKeyword}
+
+ARTICLE (excerpt):
+${articleContent.slice(0, 3500)}
+
+OUTPUT FORMAT (JSON object with both sections):
+{
+  "metadata": {
+    "title": "SEO title - max 60 chars, keyword at start",
+    "description": "Meta description - max 155 chars, keyword + benefit + CTA",
+    "slug": "url-slug-with-keyword",
+    "keywords": ["8 keywords: primary, variations, LSI terms, long-tail"],
+    "readTime": "X min read"
+  },
+  "faqs": [
+    {
+      "question": "What/How/Why question matching People Also Ask?",
+      "answer": "Concise answer 40-60 words for featured snippet."
+    }
+  ]
+}
+
+REQUIREMENTS:
+- Metadata: Title front-load keyword, description with CTA, short slug
+- FAQs: Generate exactly ${CONFIG.content.faqCount} questions covering:
+  * Definition question
+  * How-to question
+  * Comparison question
+  * Best practice question
+  * Common problem question
+
+Output ONLY valid JSON, no explanation.
 `,
 
   /**

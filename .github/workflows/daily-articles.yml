@@ -1,14 +1,13 @@
 name: Daily Article Generation
 
 on:
-  # Run 5 times daily (1 article each = 5 articles/day)
-  # Spread 4 hours apart for rate limit recovery
+  # Run 3 times daily (1 article each = 3 articles/day)
+  # Optimized for OpenRouter free tier (50 requests/day limit)
+  # 8 hours apart, off-peak US times for best API availability
   schedule:
-    - cron: '0 0 * * *'   # 07:00 AM WIB (00:00 UTC)
-    - cron: '0 4 * * *'   # 11:00 AM WIB (04:00 UTC)
-    - cron: '0 8 * * *'   # 03:00 PM WIB (08:00 UTC)
-    - cron: '0 12 * * *'  # 07:00 PM WIB (12:00 UTC)
-    - cron: '0 16 * * *'  # 11:00 PM WIB (16:00 UTC)
+    - cron: '0 1 * * *'   # 08:00 AM WIB (01:00 UTC) - US sleeping
+    - cron: '0 9 * * *'   # 04:00 PM WIB (09:00 UTC) - US early morning
+    - cron: '0 17 * * *'  # 12:00 AM WIB (17:00 UTC) - US afternoon
 
   # Allow manual trigger
   workflow_dispatch:
@@ -37,8 +36,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install tsx for script execution
-        run: npm install -g tsx
+      - name: Cache tsx globally
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-tsx-v1
+          restore-keys: ${{ runner.os }}-tsx-
 
       - name: Generate Articles
         env:

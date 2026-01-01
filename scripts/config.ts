@@ -5,20 +5,36 @@
 
 export const CONFIG = {
   // OpenRouter API Configuration
+  // Optimized for free tier (50 requests/day limit)
+  // Models selected for GOD-LEVEL article writing & storytelling
   openRouter: {
     baseUrl: "https://openrouter.ai/api/v1",
-    // Model fallback chain - tries each model in order until one succeeds
+    // Model fallback chain - 10 models for maximum availability
+    // Ordered by writing quality, with less popular models as deep fallbacks
     models: [
-      "deepseek/deepseek-r1-0528:free",           // Primary: DeepSeek R1 FREE (best quality)
-      "meta-llama/llama-3.3-70b-instruct:free",   // Fallback 1: Llama 3.3 70B FREE
-      "google/gemini-2.0-flash-exp:free",         // Fallback 2: Gemini 2.0 Flash FREE
-      "qwen/qwen-2.5-72b-instruct:free",          // Fallback 3: Qwen 2.5 72B FREE
-      "mistralai/mistral-small-3.1-24b-instruct:free", // Fallback 4: Mistral Small FREE
+      "google/gemini-2.0-flash-exp:free",             // Primary: 1M context, excellent writing
+      "meta-llama/llama-3.3-70b-instruct:free",       // Fallback 1: 70B, great narratives
+      "google/gemma-3-27b-it:free",                   // Fallback 2: 131K, multilingual
+      "mistralai/mistral-small-3.1-24b-instruct:free", // Fallback 3: Balanced, stable
+      "deepseek/deepseek-r1-0528:free",               // Fallback 4: Reasoning + writing
+      "openai/gpt-oss-120b:free",                     // Fallback 5: 120B MoE model
+      "qwen/qwen3-coder:free",                        // Fallback 6: 262K context (can write too)
+      "z-ai/glm-4.5-air:free",                        // Fallback 7: Less popular, often available
+      "tngtech/deepseek-r1t-chimera:free",            // Fallback 8: Merged model, creative
+      "google/gemma-3-12b-it:free",                   // Fallback 9: Smaller but fast
     ],
     maxTokens: 8000,
-    temperature: 0.7,
+    temperature: 0.75, // Slightly higher for more creative output
     // Wait time in seconds when ALL models are rate limited
-    rateLimitWaitSeconds: 120,
+    rateLimitWaitSeconds: 90,
+  },
+
+  // Quota Management (for free tier optimization)
+  quota: {
+    dailyLimit: 50,              // OpenRouter free tier limit
+    reservedPerArticle: 15,      // Reserve enough for retries
+    maxRetriesPerCall: 1,        // Reduced from 2 to conserve quota
+    maxGlobalRetries: 1,         // Reduced from 2 to conserve quota
   },
 
   // Content Generation Settings

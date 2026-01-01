@@ -51,7 +51,7 @@ interface GeneratedTopic {
 }
 
 // Rate limiting for free tier
-const RATE_LIMIT_DELAY = 3000;
+const RATE_LIMIT_DELAY = 2000; // Reduced from 3000ms for efficiency
 
 async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -60,17 +60,38 @@ async function delay(ms: number): Promise<void> {
 // Track which model is currently working best
 let currentModelIndex = 0;
 
+// Quota tracking for free tier (50 requests/day)
+let apiCallCount = 0;
+const QUOTA_WARNING_THRESHOLD = 40; // Warn when approaching limit
+
+function trackApiCall(): void {
+  apiCallCount++;
+  if (apiCallCount >= QUOTA_WARNING_THRESHOLD) {
+    console.log(`    ⚠️ Quota usage: ${apiCallCount}/${CONFIG.quota.dailyLimit} requests`);
+  }
+}
+
+function canMakeApiCall(): boolean {
+  return apiCallCount < CONFIG.quota.dailyLimit - 5; // Keep 5 as emergency buffer
+}
+
 // OpenRouter API call with model fallback chain and rate limit recovery
+// Optimized for free tier quota conservation
 async function callOpenRouter(
   prompt: string,
   maxTokens: number = CONFIG.openRouter.maxTokens,
-  retriesPerModel: number = 2,
-  globalRetries: number = 2 // Retry entire chain if all rate limited
+  retriesPerModel: number = CONFIG.quota.maxRetriesPerCall,
+  globalRetries: number = CONFIG.quota.maxGlobalRetries
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
     throw new Error('OPENROUTER_API_KEY environment variable is required');
+  }
+
+  // Check quota before making call
+  if (!canMakeApiCall()) {
+    throw new Error(`Quota limit approaching (${apiCallCount}/${CONFIG.quota.dailyLimit}). Aborting to preserve quota for next run.`);
   }
 
   const models = CONFIG.openRouter.models;
@@ -86,6 +107,9 @@ async function callOpenRouter(
 
       for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
         try {
+          // Track API call before making request
+          trackApiCall();
+
           const response = await fetch(`${CONFIG.openRouter.baseUrl}/chat/completions`, {
             method: 'POST',
             headers: {
@@ -99,14 +123,7 @@ async function callOpenRouter(
               messages: [
                 {
                   role: 'system',
-                  content: `You are a world-class expert combining deep domain knowledge, exceptional writing skills, and elite SEO expertise. You create content that:
-- Demonstrates genuine expertise and authority
-- Provides unique insights not found elsewhere
-- Ranks #1 on Google through superior quality
-- Gets cited by AI systems as authoritative sources
-Always output exactly what is requested. Be comprehensive, specific, and valuable.
-IMPORTANT: Output ONLY what is requested. NO thinking tags, NO reasoning, NO preamble.
-IMPORTANT: Write LONG, comprehensive content. Aim for 2500+ words with detailed explanations.`,
+                  content: `You are a world-class journalist and storyteller with deep domain expertise. Your writing captivates readers from the first sentence. You craft narratives that are insightful, authoritative, and impossible to stop reading. Write with vivid examples, compelling hooks, and expert analysis. Output exactly what is requested - NO thinking tags, NO preamble. Create comprehensive 2500+ word masterpieces.`,
                 },
                 {
                   role: 'user',
@@ -353,39 +370,40 @@ Generate exactly 1 topic. Output ONLY valid JSON, no thinking or reasoning tags.
   throw new Error('All topic generation attempts failed');
 }
 
-// STEP 1: Deep Research
+// OPTIMIZED STEP 1: Combined Research + Outline (saves 1 API call)
+async function conductResearchAndOutline(topic: GeneratedTopic): Promise<string> {
+  console.log('    📚 Step 1/3: Research + Outline (combined)...');
+  const prompt = PROMPTS.researchAndOutline(topic.title, topic.category, topic.targetKeyword);
+  const researchAndOutline = await callOpenRouter(prompt, 5000);
+  console.log('    ✓ Research & outline complete');
+  return researchAndOutline;
+}
+
+// Legacy functions kept for backwards compatibility
 async function conductResearch(topic: GeneratedTopic): Promise<string> {
-  console.log('    📚 Step 1/5: Conducting deep research...');
-  const prompt = PROMPTS.deepResearch(topic.title, topic.category);
-  const research = await callOpenRouter(prompt, 4000);
-  console.log('    ✓ Research complete');
+  return conductResearchAndOutline(topic);
+}
+
+async function createOutline(topic: GeneratedTopic, research: string): Promise<string> {
+  // When using combined approach, research already includes outline
   return research;
 }
 
-// STEP 2: Strategic Outline
-async function createOutline(topic: GeneratedTopic, research: string): Promise<string> {
-  console.log('    📋 Step 2/5: Creating strategic outline...');
-  const prompt = PROMPTS.strategicOutline(topic.title, research, topic.targetKeyword);
-  const outline = await callOpenRouter(prompt, 3000);
-  console.log('    ✓ Outline complete');
-  return outline;
-}
-
-// STEP 3: Generate Article Content
+// OPTIMIZED STEP 2: Generate Article Content
 async function generateArticleContent(
   topic: GeneratedTopic,
-  research: string,
-  outline: string
+  researchAndOutline: string,
+  _outline?: string // Optional for backwards compatibility
 ): Promise<string> {
-  console.log('    ✍️  Step 3/5: Writing article...');
+  console.log('    ✍️  Step 2/3: Writing article...');
 
   const relatedArticles = getRelatedArticles();
   const prompt = PROMPTS.articleGeneration(
     topic.title,
     topic.targetKeyword,
     topic.category,
-    research,
-    outline,
+    researchAndOutline,
+    researchAndOutline, // Use combined research+outline
     relatedArticles
   );
 
@@ -394,32 +412,58 @@ async function generateArticleContent(
   return content;
 }
 
-// STEP 4: Generate FAQ
-async function generateFAQ(topic: GeneratedTopic, content: string): Promise<FAQ[]> {
-  console.log('    ❓ Step 4/5: Generating FAQ...');
+// Interface for combined FAQ + Metadata response
+interface FAQAndMetadataResponse {
+  metadata: ArticleMetadata;
+  faqs: FAQ[];
+}
 
-  const prompt = PROMPTS.faqGeneration(topic.title, topic.targetKeyword, content);
-  const response = await callOpenRouter(prompt, 2000);
+// OPTIMIZED STEP 3: Combined FAQ + Metadata (saves 1 API call)
+async function generateFAQAndMetadata(
+  topic: GeneratedTopic,
+  content: string
+): Promise<{ faqs: FAQ[]; metadata: ArticleMetadata }> {
+  console.log('    🎯 Step 3/3: FAQ + Metadata (combined)...');
+
+  const prompt = PROMPTS.faqAndMetadata(topic.title, topic.targetKeyword, content);
+  const response = await callOpenRouter(prompt, 2500);
 
   try {
-    const faqs = parseJsonResponse<FAQ[]>(response);
-    console.log(`    ✓ Generated ${faqs.length} FAQs`);
-    return faqs;
+    const parsed = parseJsonResponse<FAQAndMetadataResponse>(response);
+    console.log(`    ✓ Generated ${parsed.faqs.length} FAQs + metadata`);
+    return {
+      faqs: parsed.faqs,
+      metadata: parsed.metadata,
+    };
   } catch {
-    console.log('    ⚠️ FAQ parsing failed, using defaults');
-    return [
-      {
-        question: `What is ${topic.targetKeyword}?`,
-        answer: `${topic.targetKeyword} refers to the main concept covered in this comprehensive guide.`,
+    console.log('    ⚠️ Combined parsing failed, using defaults');
+    return {
+      faqs: [
+        {
+          question: `What is ${topic.targetKeyword}?`,
+          answer: `${topic.targetKeyword} refers to the main concept covered in this comprehensive guide.`,
+        },
+      ],
+      metadata: {
+        title: topic.title.slice(0, 60),
+        description: `Comprehensive guide to ${topic.targetKeyword}. Learn everything you need to know.`,
+        slug: topic.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60),
+        keywords: [topic.targetKeyword, topic.category.toLowerCase()],
+        readTime: '12 min read',
       },
-    ];
+    };
   }
 }
 
-// STEP 5: Generate SEO Metadata
-async function generateMetadata(content: string, topic: GeneratedTopic): Promise<ArticleMetadata> {
-  console.log('    🎯 Step 5/5: Optimizing SEO metadata...');
+// Legacy functions kept for backwards compatibility
+async function generateFAQ(topic: GeneratedTopic, content: string): Promise<FAQ[]> {
+  const result = await generateFAQAndMetadata(topic, content);
+  return result.faqs;
+}
 
+async function generateMetadata(content: string, topic: GeneratedTopic): Promise<ArticleMetadata> {
+  // This is only called in legacy mode - normally generateFAQAndMetadata is used
+  console.log('    🎯 Generating metadata...');
   const prompt = PROMPTS.metadataGeneration(content, topic.title, topic.targetKeyword);
   const response = await callOpenRouter(prompt, 1000);
 
@@ -821,21 +865,24 @@ interface ArticleResult {
 async function generateArticles(): Promise<void> {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
-║       🚀 FULLY AUTOMATED AI ARTICLE GENERATOR 🚀              ║
+║       🚀 OPTIMIZED AI ARTICLE GENERATOR v2.0 🚀               ║
 ║                                                               ║
-║  Every run generates FRESH unique content:                    ║
-║  1. Random category selection (weighted)                      ║
-║  2. AI generates unique topic (avoids duplicates)             ║
-║  3. Deep research → Outline → Write → FAQ → SEO               ║
-║  4. Validation & verification before saving                   ║
-║  5. Model fallback chain for 100% reliability                 ║
+║  Free-tier optimized (50 req/day limit):                      ║
+║  1. Topic generation (1 API call)                             ║
+║  2. Research + Outline combined (1 API call)                  ║
+║  3. Article writing (1 API call)                              ║
+║  4. FAQ + Metadata combined (1 API call)                      ║
+║  = Only 4 API calls per article (was 6)                       ║
+║  + Smart quota tracking + Model fallback chain                ║
 ╚═══════════════════════════════════════════════════════════════╝
 `);
 
   console.log(`📅 Date: ${new Date().toISOString()}`);
   console.log(`🤖 Models: ${CONFIG.openRouter.models.length} in fallback chain`);
   console.log(`   Primary: ${CONFIG.openRouter.models[0]}`);
-  console.log(`📝 Articles per run: ${CONFIG.content.articlesPerRun}\n`);
+  console.log(`📝 Articles per run: ${CONFIG.content.articlesPerRun}`);
+  console.log(`📊 Daily quota: ${CONFIG.quota.dailyLimit} requests (free tier)`);
+  console.log(`   Reserved per article: ~${CONFIG.quota.reservedPerArticle} requests\n`);
 
   const existingTitles = getExistingArticleTitles();
   console.log(`📚 Existing articles: ${existingTitles.length}\n`);
@@ -862,15 +909,26 @@ async function generateArticles(): Promise<void> {
       }
 
       try {
-        // Generate fresh unique topic
+        // Check quota before starting
+        if (!canMakeApiCall()) {
+          console.log('    ⚠️ Quota limit approaching. Stopping to preserve quota for next run.');
+          break;
+        }
+
+        // Generate fresh unique topic (1 API call)
         const topic = await generateFreshTopic(category, existingTitles);
 
-        // Multi-step generation
-        const research = await conductResearch(topic);
-        const outline = await createOutline(topic, research);
-        const content = await generateArticleContent(topic, research, outline);
-        const faqs = await generateFAQ(topic, content);
-        const metadata = await generateMetadata(content, topic);
+        // OPTIMIZED 3-step generation (was 5 steps, now 3)
+        // Step 1: Combined Research + Outline (1 API call - saves 1 call)
+        const researchAndOutline = await conductResearchAndOutline(topic);
+
+        // Step 2: Article content (1 API call)
+        const content = await generateArticleContent(topic, researchAndOutline);
+
+        // Step 3: Combined FAQ + Metadata (1 API call - saves 1 call)
+        const { faqs, metadata } = await generateFAQAndMetadata(topic, content);
+
+        console.log(`    📊 API calls used: ${apiCallCount}/${CONFIG.quota.dailyLimit}`);
 
         // PRE-SAVE VALIDATION
         console.log('\n    🔍 Validating content...');
@@ -967,12 +1025,14 @@ async function generateArticles(): Promise<void> {
   const successful = results.filter(r => r.status === 'success');
   const failed = results.filter(r => r.status !== 'success');
 
+  const quotaRemaining = CONFIG.quota.dailyLimit - apiCallCount;
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║                    🏁 GENERATION COMPLETE                     ║
 ╠═══════════════════════════════════════════════════════════════╣
 ║  ✅ Successful: ${String(successful.length).padEnd(46)}║
 ║  ❌ Failed:     ${String(failed.length).padEnd(46)}║
+║  📊 API calls:  ${String(`${apiCallCount} used / ${quotaRemaining} remaining`).padEnd(46)}║
 ╚═══════════════════════════════════════════════════════════════╝
 `);
 
