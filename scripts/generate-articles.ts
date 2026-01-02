@@ -526,12 +526,9 @@ function validateArticleContent(
   const issues: string[] = [];
   const warnings: string[] = [];
 
-  // 1. Check word count - STRICT: minimum 1500 words for quality
+  // 1. Check word count - informational only (no hard limit)
   const wordCount = countWords(content);
-  const minAcceptable = 1500; // Hard minimum for quality articles
-  if (wordCount < minAcceptable) {
-    issues.push(`Content too short: ${wordCount} words (min ${minAcceptable})`);
-  } else if (wordCount < CONFIG.content.minWordCount) {
+  if (wordCount < CONFIG.content.minWordCount) {
     warnings.push(`Content below target: ${wordCount} words (target ${CONFIG.content.minWordCount})`);
   }
 
